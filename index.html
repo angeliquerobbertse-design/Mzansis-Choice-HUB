@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="redgrey">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mzansi's Choice Hub (prototype)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--blue:#9F005A;--green:#2E7D5B;--gold:#FF741F;--red:#FF741F;--black:#2E1423;--cream:#FBF7F5;--ink:#2E1423;--grey:#6A5A63;--line:#E6DADF;--pale:#FFEBDD;--palegreen:#E2F3EA;--card:#fff;--paleblue:#F7E6EF;--bar:#9F005A;--stripe:linear-gradient(90deg,#FF741F,#9F005A);--rgb:159,0,90;--soon:#8a3a00;--onGold:#2E1423;--livebg:#F7E6EF;--livefg:#9F005A;--dotc:#FF741F}
+html[data-theme=flag]{--blue:#001489;--green:#007749;--gold:#FFB81C;--red:#DE3831;--black:#0b0b0b;--cream:#FAFAF6;--ink:#0A0F2E;--grey:#505766;--line:#D6D8DE;--pale:#FFF2CC;--paleblue:#E8EBFA;--bar:#3a4a9e;--stripe:linear-gradient(90deg,#007749 0 25%,#FFB81C 25% 50%,#DE3831 50% 75%,#0b0b0b 75% 100%);--rgb:0,20,137;--soon:#6b4a00;--onGold:#0A0F2E;--livebg:#FBE0DE;--livefg:#9b1f19;--dotc:#DE3831}
+html[data-theme=redgrey]{--blue:#C8102E;--green:#4B5563;--gold:#C8102E;--red:#C8102E;--black:#23262B;--cream:#F4F5F6;--ink:#23262B;--grey:#5F6670;--line:#DADCE0;--pale:#FDECEE;--paleblue:#ECEDEF;--bar:#C8102E;--stripe:linear-gradient(90deg,#C8102E,#8A9099);--rgb:200,16,46;--soon:#8c0b20;--onGold:#fff;--livebg:#FDECEE;--livefg:#C8102E;--dotc:#C8102E}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:'Poppins',Arial,sans-serif;background:var(--cream);color:var(--ink);font-size:14px;line-height:1.45}
+button,select,input{font:inherit;color:inherit}
+h1,h2,h3,h4{margin:0;line-height:1.2}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+/* header */
+header.top{background:#fff;color:var(--ink);position:relative;border-bottom:1px solid var(--line)}
+header.top::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--stripe)}
+.top .wrap{display:flex;align-items:center;gap:16px;padding-top:14px;padding-bottom:19px;flex-wrap:wrap}
+.brand{font-weight:800;font-size:20px;letter-spacing:.2px;color:var(--blue)}
+.brand small{display:block;font-weight:400;font-size:12px;color:var(--grey);letter-spacing:0}
+.demo{background:var(--pale);color:var(--ink);font-weight:700;font-size:11px;padding:4px 10px;border-radius:99px;letter-spacing:.5px}
+.sp{flex:1}
+.ctl{display:flex;align-items:center;gap:8px;font-size:12px}
+.ctl select{background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:99px;padding:6px 12px;font-size:12px}
+.ctl label.chk{display:flex;gap:6px;align-items:center;cursor:pointer}
+/* tabs */
+nav.tabs{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+nav.tabs .wrap{display:flex;gap:4px;overflow-x:auto}
+.tab{border:0;background:none;padding:14px 18px;font-weight:700;color:var(--grey);cursor:pointer;border-bottom:4px solid transparent;white-space:nowrap}
+.tab small{display:block;font-weight:400;font-size:10.5px;letter-spacing:.3px}
+.tab.on{color:var(--blue);border-bottom-color:var(--gold)}
+.tab:focus-visible,.btn:focus-visible,.chip:focus-visible,.sub:focus-visible,.row-h:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+main{padding:22px 0 60px}
+.pane{display:none}.pane.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:1px;color:var(--grey);text-transform:uppercase}
+.muted{color:var(--grey)}
+.btn{border:0;border-radius:99px;padding:11px 20px;font-weight:700;cursor:pointer;background:var(--blue);color:#fff}
+.btn.gold{background:var(--gold);color:var(--onGold)}
+.btn:disabled{background:#d9dbe2;color:#7b8190;cursor:not-allowed}
+.btn.ghost{background:#fff;border:2px solid var(--blue);color:var(--blue);padding:8px 16px}
+.pill{display:inline-block;border-radius:99px;padding:3px 10px;font-size:11px;font-weight:700;letter-spacing:.3px}
+.pill.live{background:var(--livebg);color:var(--livefg)}
+.pill.closed{background:#4a5062;color:#fff}
+.pill.soon{background:var(--pale);color:var(--soon)}
+.pill.good{background:var(--palegreen);color:#005a37}
+.pill.med{background:var(--pale);color:var(--soon)}
+.pill.high{background:#FBE0DE;color:#9b1f19}
+.pill.ph{background:var(--paleblue);color:var(--blue)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--dotc);margin-right:5px;animation:pulse 1.4s infinite}
+@keyframes pulse{50%{opacity:.25}}
+/* pillar rail */
+.rail{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+.pl{border:2px solid var(--line);background:#fff;border-radius:99px;padding:9px 18px;font-weight:700;color:var(--grey)}
+.pl.on{border-color:var(--ink);background:var(--ink);color:#fff}
+.pl.off{opacity:.65;border-style:dashed}
+.pl small{font-weight:400;font-size:10.5px;margin-left:6px}
+/* month panel */
+.month{margin-bottom:16px}
+.month-h{display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap;margin-bottom:12px}
+.month-h h2{font-size:22px}
+.cal{display:grid;grid-template-columns:repeat(30,1fr);gap:3px;margin:10px 0 6px}
+.cd{min-width:0;padding:0;height:34px;border-radius:6px;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;position:relative;color:#fff;opacity:.35;cursor:pointer;border:0}
+.cd.past{opacity:1}.cd.today{opacity:1;box-shadow:0 0 0 3px #fff,0 0 0 6px var(--ink)}
+.cd.c-gold{color:var(--ink)}
+.wins{display:grid;gap:8px;grid-template-columns:repeat(5,1fr)}
+.sub{border:2px solid var(--line);background:#fff;border-radius:14px;padding:10px 12px;text-align:left;cursor:pointer}
+.sub.on{border-color:var(--ink)}
+.sub b{display:block;font-size:14px}
+.sub span{font-size:11.5px;color:var(--grey)}
+.sub .pill{margin-top:6px}
+.slider{display:flex;gap:10px;align-items:center;font-size:12px;color:var(--grey);margin-top:12px;flex-wrap:wrap}
+.slider input{flex:1;min-width:160px;accent-color:var(--blue)}
+.note{font-size:11.5px;color:var(--grey)}
+/* board */
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;align-items:start}
+.board-h{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:6px}
+.board-h h3{font-size:19px}
+.seg{display:inline-flex;border:2px solid var(--blue);border-radius:99px;overflow:hidden}
+.seg button{border:0;background:#fff;padding:6px 14px;font-weight:700;font-size:12px;color:var(--blue);cursor:pointer}
+.seg button.on{background:var(--blue);color:#fff}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}
+.chip{border:1.5px solid var(--line);background:#fff;border-radius:99px;padding:5px 12px;font-size:12px;cursor:pointer;font-weight:700;color:var(--grey)}
+.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.q-label{font-size:12px;font-weight:700;margin-top:10px}
+.row{border:1px solid var(--line);border-radius:12px;margin-bottom:8px;background:#fff;overflow:hidden;transition:box-shadow .4s,border-color .4s}
+.row.me{border-color:var(--gold);box-shadow:0 0 0 3px var(--pale)}
+.row-h{display:grid;grid-template-columns:34px 38px minmax(0,1fr) 56px;gap:10px;align-items:center;padding:10px 12px;cursor:pointer;width:100%;border:0;background:none;text-align:left}
+.rk{font-weight:800;font-size:18px;color:var(--blue);text-align:center}
+.rk i{display:block;font-size:9px;font-style:normal;line-height:1}
+.up{color:var(--green)}.dn{color:var(--red)}
+.av{width:38px;height:38px;border-radius:50%;background:var(--paleblue);color:var(--blue);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px}
+.nm{font-weight:700;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.bar{height:8px;background:#eceef3;border-radius:99px;margin:5px 0;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--bar);border-radius:99px;transition:width .5s}
+.why{font-size:12px;color:var(--grey)}
+.why b{color:var(--ink)}
+.pc{font-weight:800;font-size:18px;text-align:right}
+.pc small{display:block;font-weight:400;font-size:10.5px;color:var(--grey)}
+.detail{display:none;padding:4px 14px 14px 14px;border-top:1px dashed var(--line);background:#FCFCF9}
+.row.open .detail{display:block}
+.sent{background:var(--pale);border-radius:10px;padding:10px 12px;margin:10px 0;font-size:13px}
+.mini{display:grid;grid-template-columns:150px minmax(0,1fr) 60px;gap:8px;align-items:center;font-size:12px;margin:5px 0}
+.mini .t{position:relative;height:12px;background:#eceef3;border-radius:6px}
+.mini .t i{position:absolute;left:0;top:0;bottom:0;background:var(--bar);border-radius:6px}
+.mini .t u{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink)}
+.mini .ix{text-align:right;font-weight:700}
+.legend{font-size:11px;color:var(--grey);margin-top:6px}
+.legend u{display:inline-block;width:2px;height:10px;background:var(--ink);vertical-align:middle;margin:0 4px}
+.legend i{display:inline-block;width:12px;height:8px;background:var(--bar);border-radius:4px;vertical-align:middle;margin:0 4px}
+table{border-collapse:collapse;width:100%}
+th,td{padding:8px 10px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line);font-size:12.5px}
+th{font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:var(--grey)}
+.matrix td,.matrix th{text-align:center}
+.matrix td:first-child,.matrix th:first-child{text-align:left;white-space:nowrap}
+.matrix td.cell{font-weight:700;border-radius:0;border:2px solid #fff}
+.locked{text-align:center;padding:28px 12px;background:var(--cream);border-radius:12px;border:2px dashed var(--line)}
+.locked h4{font-size:16px;margin-bottom:6px}
+.locked .chips{justify-content:center}
+.side .card{margin-bottom:16px}
+.side h4{font-size:15px;margin-bottom:8px}
+.cta{background:var(--ink);color:#fff;border:0}
+.cta h4{font-size:18px}
+.cta p{margin:6px 0 12px;opacity:.9;font-size:13px}
+.bars .b{display:grid;grid-template-columns:minmax(0,1fr) 44px;gap:8px;font-size:12px;margin:8px 0 2px}
+.bars .b b{text-align:right}
+.bars .bar{margin:0 0 4px}
+.bars .bar i{background:var(--bar)}
+.ad{display:none;border:2px dashed var(--red);background:repeating-linear-gradient(45deg,#fff,#fff 8px,#fbeceb 8px,#fbeceb 16px);border-radius:10px;align-items:center;justify-content:center;text-align:center;font-size:12px;color:#9b1f19;font-weight:700;position:relative;margin-bottom:16px}
+body.ads .ad{display:flex}
+.ad em{position:absolute;top:-10px;left:10px;background:var(--red);color:#fff;border-radius:99px;padding:1px 8px;font-style:normal;font-size:11px}
+.ad span{font-weight:400;display:block}
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(10,15,46,.65);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
+.modal.on{display:flex}
+.mbox{background:#fff;border-radius:18px;padding:16px;display:flex;gap:16px;max-width:760px;width:100%;max-height:96vh;overflow:auto}
+.mbox iframe{width:300px;height:600px;border:0;border-radius:12px;flex:none;box-shadow:0 0 0 1px var(--line)}
+.mside{flex:1;min-width:0}
+.mside h3{font-size:18px;margin-bottom:8px}
+.mside li{margin-bottom:6px;font-size:13px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(30px);background:var(--ink);color:#fff;border-radius:99px;padding:10px 20px;font-size:13px;opacity:0;transition:.3s;z-index:60;pointer-events:none}
+.toast.on{opacity:1;transform:translateX(-50%)}
+/* commercial */
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.h2{font-size:22px;margin-bottom:6px}
+.lead{max-width:760px;color:var(--grey);margin:0 0 16px}
+.wf{background:#fff;border:2px solid var(--ink);border-radius:12px;padding:12px;font-size:11px}
+.wf .bx{border:1.5px solid #b9bcc8;background:#f3f4f8;border-radius:6px;padding:6px;text-align:center;color:var(--grey);margin-bottom:8px}
+.wf .pl-n{border:2px solid #b9bcc8;background:#fff;color:var(--grey);font-weight:700;opacity:.4;transition:.2s;position:relative}
+.wf .pl-n.act{opacity:1;background:var(--pale);border-color:var(--ink);color:var(--ink)}
+.wf .pl-n b{display:inline-flex;width:20px;height:20px;border-radius:50%;background:var(--ink);color:#fff;align-items:center;justify-content:center;margin-right:6px;font-size:11px}
+.wf .cols{display:grid;grid-template-columns:minmax(0,1fr) 120px;gap:8px}
+.ph-sel{margin:0 0 14px}
+.tag{display:inline-block;background:var(--paleblue);color:var(--blue);font-weight:700;font-size:10.5px;border-radius:99px;padding:2px 8px;margin:1px 3px 1px 0}
+.guard li{margin-bottom:6px}
+.open{border-left:6px solid var(--gold);background:var(--pale);padding:12px 16px;border-radius:8px;margin:16px 0}
+/* dev */
+pre{background:#0d1230;color:#e8ebff;border-radius:12px;padding:14px;overflow:auto;font-size:12px;line-height:1.5;margin:8px 0}
+code{font-family:Consolas,Menlo,monospace}
+.arch{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;align-items:stretch;margin:12px 0}
+.arch div{border:2px solid var(--blue);border-radius:12px;padding:10px;font-size:12px;background:#fff}
+.arch div b{display:block;color:var(--blue);margin-bottom:4px}
+.arch div.hl{background:var(--pale);border-color:var(--gold)}
+.k{font-family:Consolas,Menlo,monospace;background:#eef0f7;padding:1px 5px;border-radius:4px;font-size:12px}
+.last{min-height:60px}
+.lanes{margin-top:16px}
+.lane{margin-bottom:16px}
+.lane-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.lane-h h3{font-size:16px}
+.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.tile{display:block;border:1px solid var(--line);border-radius:12px;padding:12px;background:#fff;color:inherit;text-decoration:none}
+.tile:hover{border-color:var(--ink)}
+.tile .k{display:inline-block;font-family:inherit;background:var(--paleblue);color:var(--ink);font-weight:700;font-size:10.5px;border-radius:99px;padding:2px 8px;margin-bottom:6px;letter-spacing:.3px}
+.tile.spons{background:var(--pale);border-style:dashed}
+.tile h4{font-size:14px;margin-bottom:6px}
+.tile .go{font-size:12px;font-weight:700;color:var(--blue)}
+.tile .tg{display:block;font-size:10px;color:var(--grey);margin-top:6px;word-break:break-all}
+.lane-lock{border:2px dashed var(--line);border-radius:12px;padding:14px;text-align:center;color:var(--grey);font-size:13px;background:#fff}
+@media(max-width:900px){.tiles{grid-template-columns:1fr}.grid{grid-template-columns:1fr}.wins{grid-template-columns:repeat(2,1fr)}.two,.three{grid-template-columns:1fr}.arch{grid-template-columns:1fr 1fr}.mbox{flex-direction:column;align-items:center}.mini{grid-template-columns:110px minmax(0,1fr) 54px}}
+@media(max-width:560px){.cal{grid-template-columns:repeat(10,1fr)}.row-h{grid-template-columns:28px 32px minmax(0,1fr) 50px;gap:6px}.av{width:32px;height:32px}.arch{grid-template-columns:1fr}.wrap{padding:0 14px}}
+.rail button.pl{font:inherit;cursor:pointer}.rail .pl.sel{outline:2px solid var(--gold);outline-offset:1px}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="brand">Mzansi's Choice<small>You choose. Mzansi decides.</small></div>
+    <span class="demo">PROTOTYPE · DEMO DATA</span>
+    <div class="sp"></div>
+    <div class="ctl"><label for="mode">Results shown</label>
+      <select id="mode"><option value="live">Live</option><option value="delayed">Delayed (end of previous day)</option><option value="close">Only after the window closes</option></select></div>
+    <div class="ctl"><span>Colours</span><div class="seg" id="theme"><button data-theme="volt">Volt</button><button data-theme="flag">SA flag</button><button class="on" data-theme="redgrey">Red and grey</button></div></div>
+    <div class="ctl"><label class="chk"><input type="checkbox" id="traffic" checked> Demo traffic</label></div>
+  </div>
+</header>
+
+<nav class="tabs" aria-label="Hub views"><div class="wrap" role="tablist">
+  <button class="tab on" role="tab" data-tab="hub" aria-selected="true">Hub<small>Public view</small></button>
+  <button class="tab" role="tab" data-tab="com" aria-selected="false">Commercial<small>Internal · display positioning</small></button>
+  <button class="tab" role="tab" data-tab="dev" aria-selected="false">Developer<small>Internal · build notes</small></button>
+  <button class="tab" role="tab" data-tab="cont" aria-selected="false">Content<small>Internal · content layer</small></button>
+  <button class="tab" role="tab" data-tab="data" aria-selected="false">Data<small>Internal · what we can collect</small></button>
+</div></nav>
+
+<main><div class="wrap">
+
+<!-- ============ HUB ============ -->
+<section class="pane on" id="pane-hub">
+
+  <div class="rail" id="rail"></div>
+  <div id="railDetail"></div>
+
+  <div class="card month">
+    <div class="month-h">
+      <div><div class="eyebrow">Pillar run · pilot</div><h2 id="mTitle">Insurance</h2></div>
+      <div class="note" style="max-width:520px">One pillar runs at a time, for five 7-day windows (35 days). Each sub-pillar takes its turn on the board with its own voting window. The pilot starts on 1 February 2027. Pillar order and dates are proposals until EXCO confirms them.</div>
+    </div>
+    <div class="wins" id="wins"></div>
+    <div class="slider"><label for="day"><b>Demo control:</b> today is Day <b id="dayN">9</b> of 35</label><input type="range" id="day" min="1" max="35" value="9"><span class="note">Move the slider to see windows open, close and results appear.</span></div>
+  </div>
+
+  <div class="grid">
+    <div>
+      <div class="card" id="board"></div>
+      <div class="lanes" id="lanes"></div>
+    </div>
+    <aside class="side">
+      <div class="card cta" id="cta"></div>
+      <div class="card" id="priority"></div>
+      <div class="card" id="mix"></div>
+    </aside>
+  </div>
+  <p class="note" style="margin-top:6px">All numbers on this prototype are generated demo data. Real results will reflect valid responses from participating IOL audiences, not all South Africans. Every provider in a category can be chosen, whether or not it advertises.</p>
+</section>
+
+<!-- ============ COMMERCIAL ============ -->
+<section class="pane" id="pane-com">
+  <h2 class="h2">Commercial opportunity: where brands can show presence</h2>
+  <p class="lead">Brands can be present while South Africans decide, and they can never influence the vote. Presence sits next to the scoreboard, never inside it. Packages and prices are not set, so none are shown. Names below are illustrative.</p>
+
+  <div class="seg ph-sel" id="phase"><button class="on" data-p="before">Before the window</button><button data-p="during">During the window</button><button data-p="after">After the result (open voting)</button></div>
+
+  <div class="two">
+    <div>
+      <div class="wf" id="wf">
+        <div class="bx pl-n" data-n="1"><b>1</b>Pillar partner leaderboard · 970x250 / 728x90</div>
+        <div class="bx">Hub header · pillar run</div>
+        <div class="bx pl-n" data-n="2"><b>2</b>Window presenter · "Car window presented by…"</div>
+        <div class="bx">Calendar · 7-day windows</div>
+        <div class="cols">
+          <div>
+            <div class="bx" style="height:90px">Live scoreboard<br>(providers and why)</div>
+            <div class="bx pl-n" data-n="6"><b>6</b>Results presenter · after close</div>
+            <div class="bx pl-n" data-n="5"><b>5</b>Sponsored in-feed guide</div>
+          </div>
+          <div>
+            <div class="bx">Vote now</div>
+            <div class="bx pl-n" data-n="3" style="height:70px"><b>3</b>300x600</div>
+            <div class="bx">What matters most</div>
+            <div class="bx pl-n" data-n="4"><b>4</b>300x250</div>
+          </div>
+        </div>
+      </div>
+      <p class="note">Highlighted boxes are live in the chosen phase.</p>
+    </div>
+    <div>
+      <div class="card">
+        <h3 style="margin-bottom:8px">What a client can buy</h3>
+        <table><thead><tr><th>#</th><th>Position</th><th>Phase</th></tr></thead><tbody id="plTbl"></tbody></table>
+        <p class="note" style="margin-top:8px">Rate card, audience figures and availability: to be confirmed with Sales Operations.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="two" style="margin-top:16px">
+    <div class="card guard">
+      <h3 style="margin-bottom:8px">Guardrails that protect the property</h3>
+      <ul>
+        <li>Every placement is labelled <b>ADVERT</b> or <b>Sponsored</b>.</li>
+        <li>No advert sits inside the scoreboard rows, and nothing is sold as a rank, a position or a "winner" badge.</li>
+        <li>Providers are shown in random order in the widget, and every provider in the category can be chosen.</li>
+        <li>Placement does not change with votes, and votes do not change with placement.</li>
+        <li>No advertiser is described as the winner unless valid results support it, and then only through the results themselves.</li>
+        <li>Results wording: "valid responses from participating IOL audiences".</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin-bottom:8px">Who to approach, by sub-pillar</h3>
+      <div class="chips" id="cmChips"></div>
+      <div id="cmBody"></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px"><h3 style="margin-bottom:6px">Staying top of mind: the 12-month cycle</h3>
+  <p class="lead" style="margin-bottom:10px">Voting never closes after the campaign, so a client has a reason to stay visible. The pitch is presence and relevance, never the outcome. Nothing a client buys can influence either winner.</p>
+  <div class="three">
+    <div class="card"><div class="eyebrow">Stage 1 · 7-day campaign</div><h4 style="margin:6px 0">Be in the moment</h4><p class="note">Window presenter, half-page, MPU and sponsored guide while the decision is being made. A campaign winner is announced when the window closes.</p></div>
+    <div class="card"><div class="eyebrow">Stage 2 · open voting</div><h4 style="margin:6px 0">Stay top of mind</h4><p class="note">Always-on presence on IOL and the other titles while people keep voting and reading the results content. Results presenter and sponsored guides stay live. Priced as an ongoing presence, not a one-off.</p></div>
+    <div class="card"><div class="eyebrow">Stage 3 · cycle finale</div><h4 style="margin:6px 0">Close the year</h4><p class="note">At the end of 12 months a new winner is announced from open voting. A natural moment for a final burst of presence and a year-in-review.</p></div>
+  </div>
+  <ul class="guard" style="margin-top:10px">
+    <li><b>Sell presence, not wins.</b> The risk is a client reading continued spend as a way to lift its rank. Say plainly in every proposal that advertising never influences either winner.</li>
+    <li><b>A client who sponsors its own category while open voting runs</b> adds to the open decision below, and the effect lasts all year rather than six days.</li>
+    <li>Which titles carry the always-on layer, and the rate card, are to be confirmed with Sales Operations.</li>
+  </ul></div>
+
+<div class="open"><b>Open decision.</b> Can a provider that is in the running for a category sponsor that category's window or results? Allowing it is commercially strongest but risks the appearance of influence. Options: allow with clear labelling; allow only before and after the window; or allow only the pillar-level partner and other sponsors. This needs a call from Product, Legal and Sales.</div>
+</section>
+
+<!-- ============ DEVELOPER ============ -->
+<section class="pane" id="pane-dev">
+  <h2 class="h2">Developer notes</h2>
+  <p class="lead">A starting point for Development and Product to validate. The scoreboard maths, thresholds and integrity layers are proposals, not decisions. The widget on this page is the real 300x600 build and it posts a real payload. Each window has at most 5 questions, and every panel on the hub is built from that one list.</p>
+
+  <div class="card"><h3>Shape of the system</h3>
+    <div class="arch">
+      <div><b>1 · Run config</b>Pillar, sub-pillars, 7-day windows, questions, providers, sponsors. Edited in the CMS, no code.</div>
+      <div><b>2 · Widget</b>300x600, config-driven. Collects the vote and three answers. Fires an event and posts to the endpoint.</div>
+      <div class="hl"><b>3 · Vote service</b>Validates, de-duplicates, scores, stores. The only writer of results.</div>
+      <div><b>4 · Aggregates</b>Counts per window, provider and "what matters most" answer. Cached, rebuilt on a short interval.</div>
+      <div><b>5 · Hub</b>Reads aggregates only. Never sees raw votes. Obeys the results mode.</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px"><h3>One widget, one config per window</h3>
+    <p class="note">There is no widget per pillar. The widget is built once and hosted on the IOL domain or a CDN with a version number. Each window (for example Insurance, Pet, 1 to 7 March 2027) has its own config. About 50 configs in the first year.</p>
+    <div class="arch">
+      <div><b>1 · Embed</b>Every placement carries only the window ID, for example <span class="k">insurance-pet</span>.</div>
+      <div><b>2 · Fetch</b>The widget asks the config store for that window.</div>
+      <div><b>3 · Render</b>Questions, providers, dates and sponsor line come from the config. Status decides what shows: live, closed or open voting.</div>
+      <div class="hl"><b>4 · Vote</b>Each vote carries the window ID and the config version it was answered against.</div>
+      <div><b>5 · Report</b>Aggregates are grouped by window and version. The hub reads these only.</div>
+    </div>
+    <div class="two" style="margin-top:12px">
+      <div><h3>Where each thing is stored</h3>
+<pre><code>Widget code      CDN / IOL domain, versioned
+Window configs   CMS or config store (editable)
+Provider master  one list per category, reused
+Votes + answers  database, written only by the vote service
+Aggregates       cached table, read by the hub
+Audit log        every rule, edit and status change</code></pre></div>
+      <div><h3>Window config (one record)</h3>
+<pre><code>{
+  "windowId": "insurance-pet",
+  "version": 3,
+  "status": "draft | scheduled | live | closed | open",
+  "pillar": "Insurance",
+  "subPillar": "Pet",
+  "opensOn": "2027-01-13",
+  "closesOn": "2027-01-18",
+  "questions": [ ...max 5 ],
+  "providerListId": "pet-insurance",
+  "sponsor": { "label": "…", "from": "…", "to": "…" }
+}</code></pre></div>
+    </div>
+    <p class="note" style="margin-top:8px">Recommendation: start with an iframe on the IOL domain. It can store and report properly. Serving the 300x600 through an ad server gives wider reach but limits what can be stored and measured.</p>
+  </div>
+
+  <div class="card" style="margin-top:16px"><h3>What the team can change, and what is locked</h3>
+    <p class="note">Pillars, sub-pillars and windows are data, not code. Adding "Travel" or a new sub-pillar needs no developer. The questions are the one thing the system itself must lock. This should be enforced by the vote service, not left to people remembering.</p>
+    <div style="overflow-x:auto"><table><thead><tr><th>Item</th><th>Draft or scheduled</th><th>Live</th><th>Closed or open voting</th></tr></thead><tbody>
+      <tr><td>Add or rename a pillar or sub-pillar</td><td>Yes</td><td>Yes, other windows only</td><td>Yes, other windows only</td></tr>
+      <tr><td>Move window dates</td><td>Yes</td><td>No, extend only by approval</td><td>No</td></tr>
+      <tr><td><b>Questions and answer options</b></td><td>Yes</td><td><b>Locked. No edits.</b></td><td><b>Locked. No edits.</b></td></tr>
+      <tr><td>Provider list</td><td>Yes</td><td>Add only, never remove</td><td>Add only</td></tr>
+      <tr><td>Sponsor line and placements</td><td>Yes</td><td>Yes, never touches the vote</td><td>Yes</td></tr>
+      <tr><td>Wording fix (typo)</td><td>Yes</td><td>Needs sign-off, logged as a note, not a new version</td><td>Same</td></tr>
+    </tbody></table></div>
+    <ul class="guard" style="margin-top:8px">
+      <li><b>Lock on go-live.</b> When a window goes live its questions are frozen. The vote service rejects any edit and the CMS shows the fields as read-only.</li>
+      <li><b>A change means a new window.</b> If a question is truly wrong, close the window as void and open a new one. Never edit and carry on, because the votes before and after would not be comparable.</li>
+      <li><b>Open voting inherits the same questions.</b> Open voters answer the identical questions, so open votes can sit beside the campaign result.</li>
+      <li><b>Next year's cycle can use new questions.</b> That is a new cycle with its own windows. Do not compare cycle winners across different question sets without saying so.</li>
+      <li><b>Every change is logged</b> with who, when and what, so the audit trail can answer a challenge.</li>
+    </ul>
+  </div>
+
+  <div class="two" style="margin-top:16px">
+    <div class="card"><h3>Pillar run config</h3>
+<pre><code id="cfgJson"></code></pre></div>
+    <div class="card"><h3>Vote received from the widget (live)</h3>
+      <p class="note">Open "Vote now" on the Hub tab and finish the widget. The real payload appears here.</p>
+<pre class="last"><code id="lastVote">(no vote yet)</code></pre>
+      <h3 style="margin-top:12px">Embed and events</h3>
+<pre><code>&lt;iframe src="https://…/widget?campaign=insurance-car"
+        width="300" height="600" title="Mzansi's Choice"&gt;&lt;/iframe&gt;
+
+// host page
+window.addEventListener('message', e =&gt; {
+  if (e.data &amp;&amp; e.data.source === 'mzansis-choice') {
+    // e.data.payload = { campaign, category, answers, submittedAt }
+  }
+});
+// inside the widget page: window event 'mzansis-choice:vote'</code></pre></div>
+  </div>
+
+  <div class="two" style="margin-top:16px">
+    <div class="card"><h3>Endpoints (proposed)</h3>
+<pre><code>GET  /api/v1/runs/current
+GET  /api/v1/windows/{id}
+GET  /api/v1/windows/{id}/scoreboard
+       ?criterion=claims&amp;mode=live|delayed|close
+POST /api/v1/votes
+GET  /api/v1/windows/{id}/export.csv   (internal, aggregated)</code></pre>
+      <h3 style="margin-top:12px">Data model</h3>
+<pre><code>Pillar  (id, name, active)
+SubPillar(id, pillarId, name, active)
+Run     (id, pillarId, startsOn, endsOn)       // 5 windows x 7 days
+Window  (id, runId, subPillarId, opensOn, closesOn, status, configVersion)
+Provider(id, windowId, name, active)          // every provider in category
+Question(id, windowId, configVersion, type, text, options[], lockedAt)
+Vote    (id, windowId, configVersion, phase, providerId|other, receivedAt,
+         validity, sessionHash, source)
+Answer  (voteId, questionId, option)
+Sponsor (id, placement, windowId?, label, from, to)
+AuditLog(id, who, what, windowId, at)</code></pre></div>
+    <div class="card"><h3>Scoreboard maths</h3>
+<pre><code>share(p)     = votes(p) / votes(all)
+drivers(p,c) = votes(p AND c) / votes(p)      // why: share of p's voters who put c first
+base(c)      = votes(c) / votes(all)
+index(p,c)   = drivers(p,c) / base(c) * 100   // 100 = average
+filter c     : rank by votes(p AND c) / votes(c)
+
+Show a provider's "why" only if votes(p) &gt;= <span id="minP">100</span>
+Show a cell only if      votes(p AND c) &gt;= <span id="minC">30</span></code></pre>
+      <p class="note">Thresholds are placeholders. Set them with Data and Product so small samples never read as findings.</p>
+      <h3 style="margin-top:12px">Integrity layers (to validate, none guarantees one person, one vote)</h3>
+      <ul class="guard">
+        <li>Server-side rate limits and a session token per window.</li>
+        <li>Bot challenge on submit, and duplicate detection on a hashed signal.</li>
+        <li>Optional sign-in later, which is stronger but changes the data and POPIA picture.</li>
+        <li>Anomaly alerts on spikes for one provider, and an audit log of every rule applied.</li>
+        <li>Invalid votes kept and flagged, never silently dropped, so results can be audited.</li>
+      </ul></div>
+  </div>
+
+  <div class="card" style="margin-top:16px"><h3>Open questions for Development and Product</h3>
+    <ul class="guard">
+      <li><b>Results mode.</b> The EXCO brief proposed no live leaderboard in the pilot. This prototype has a live, delayed and after-close switch so the team can decide. Live boards invite bandwagon voting and manipulation, so delayed or after-close is the safer start.</li>
+      <li><b>Where does validation live?</b> A vote service owned by IOL Digital, or a vendor?</li>
+      <li><b>Provider master list.</b> Who maintains it so every provider can be chosen, and how are "other" write-ins handled?</li>
+      <li><b>Window lifecycle.</b> Live for 7 days, then the campaign result (frozen and announced), then open voting with no closing date (stored with <span class="k">phase: open</span> and reported separately), then a cycle winner at the end of 12 months. The campaign result is never recalculated. Open questions: whether the cycle winner uses open votes only (recommended, it measures staying power) or all votes; whether a person may vote again in a later cycle; and monthly snapshots of open voting so the trend can be shown.</li>
+      <li><b>Open voting is easier to game than a 7-day window.</b> With no end date, a provider could keep urging its customers to vote. Rate limits, anomaly alerts and a policy on providers promoting the vote need deciding before launch.</li>
+      <li><b>Every "why" must be traceable.</b> Each reason on the board is a count of voters' own answers, shown with its numbers (for example, 112 of a provider's 290 voters against 1,100 of 4,300 overall). If anyone questions a reason such as insurer reputation, the exact counts, window and rules applied can be produced from the audit log.</li>
+      <li><b>Caching.</b> A 30 to 60 second refresh is probably enough for a "live" feel at far lower load.</li>
+      <li><b>Accessibility and data costs.</b> The widget is a single light file with no external fonts or libraries. Keep it that way.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ CONTENT ============ -->
+<section class="pane" id="pane-cont">
+  <h2 class="h2">Content layer: how articles sit around the results</h2>
+  <p class="lead">The hub is the index and IOL holds the articles. Content appears in lanes around the scoreboard and never inside it. The headlines below are placeholders to show the structure, not a commissioning list.</p>
+  <div class="two">
+    <div class="card guard"><h3 style="margin-bottom:8px">Rules for the lanes</h3>
+      <ul>
+        <li><b>Before you choose:</b> neutral explainers that name no providers. Live before and during the window, then stay up as evergreen.</li>
+        <li><b>What Mzansi said:</b> editorial on the results. Opens only after the window closes.</li>
+        <li><b>Sponsored:</b> labelled, visually separate, and never in the scoreboard rows.</li>
+        <li>No provider-specific content while a window is open for voting.</li>
+        <li>Editorial decides what runs. The hub only displays the tiles.</li>
+      </ul></div>
+    <div class="card"><h3 style="margin-bottom:8px">Measuring content to vote</h3>
+      <p class="note">Every tile link carries the window and lane so article-to-vote can be reported. Events for dev to confirm:</p>
+<pre><code>?utm_source=mzansis-choice&amp;utm_medium=hub
+&amp;utm_campaign=insurance-{window}
+&amp;utm_content={lane}-{n}
+
+events: mc_content_click -&gt; mc_hub_view
+        -&gt; mc_vote_start -&gt; mc_vote_complete</code></pre>
+      <p class="note">Strict, lower-case, identical URL patterns across all windows so GA reports cleanly.</p></div>
+  </div>
+  <div class="card" style="margin-top:16px"><h3 style="margin-bottom:8px">Content map by window</h3>
+    <div style="overflow-x:auto"><table><thead><tr><th>Window</th><th>Lane</th><th>Live</th><th>Placeholder tile</th><th>Tracking tag</th></tr></thead><tbody id="cTbl"></tbody></table></div></div>
+</section>
+
+<!-- ============ DATA ============ -->
+<section class="pane" id="pane-data">
+  <h2 class="h2">What data we can collect, and what it is worth</h2>
+  <p class="lead">Start with answers that are useful and carry little risk, then earn the right to ask for more. Each step up asks more of the voter and needs a clear reason. All legal points below are questions for Legal and the Information Officer, not conclusions.</p>
+
+  <div class="card">
+    <div class="board-h"><h3>The data ladder</h3>
+      <div class="seg" id="lvl"><button class="on" data-l="1">Anonymous</button><button data-l="2">+ Optional profile</button><button data-l="3">+ Consented identity</button></div></div>
+    <p class="note" id="lvlNote"></p>
+    <table><thead><tr><th>Data point</th><th>Collected</th><th>What it is worth</th><th>Risk</th><th>When</th></tr></thead><tbody id="dTbl"></tbody></table>
+  </div>
+
+  <div class="two" style="margin-top:16px">
+    <div class="card"><h3 style="margin-bottom:8px">Widget or hub?</h3>
+      <p><b>Widget = what people say.</b> Their priority, how they buy, how often they compare, the provider they choose. It is short, so every extra question costs completions. Two to four questions is the ceiling.</p>
+      <p><b>Hub = what people do.</b> Which windows they visit, which "why" panels they open, which filters they use, which article sent them. This is aggregate behaviour and does not need to identify anyone.</p>
+      <p class="note">Rule of thumb: ask in the widget only what the scoreboard or a client output will use.</p>
+    </div>
+    <div class="card"><h3 style="margin-bottom:8px">Do not collect</h3>
+      <ul class="guard">
+        <li>Health, medical or claims history, especially around life and funeral cover.</li>
+        <li>Race, religion, politics, sexual orientation, union membership, biometrics.</li>
+        <li>Children's information.</li>
+        <li>ID numbers, bank or policy numbers.</li>
+        <li>Open free text beyond the short "other provider" field, which is capped and screened.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <div class="board-h"><h3>What this window's data could tell a client</h3><span class="pill ph" id="prevTag">Demo numbers</span></div>
+    <div class="three" id="insights"></div>
+    <p class="note" style="margin-top:8px">Clients would only ever receive aggregated outputs with a minimum group size, never individual answers.</p>
+  </div>
+
+  <div class="two" style="margin-top:16px">
+    <div class="card"><h3 style="margin-bottom:8px">What the data can power</h3>
+      <ul class="guard">
+        <li><b>Client insight reports</b> per window: what matters most, how people buy, how often they compare.</li>
+        <li><b>Editorial planning:</b> topics that matter most become the next guides.</li>
+        <li><b>A year-on-year Mzansi's Choice index</b> that makes the property cumulative.</li>
+        <li><b>Audience segments</b>, only from voters who agreed to be contacted.</li>
+      </ul></div>
+    <div class="card"><h3 style="margin-bottom:8px">Questions for Legal and Privacy</h3>
+      <ul class="guard">
+        <li>Is an IP address or a hashed device signal personal information here, and how long may it be kept?</li>
+        <li>What consent wording is needed for follow-up and partner contact, and how is it recorded?</li>
+        <li>What minimum group size is safe for sharing aggregates with clients?</li>
+        <li>Who is the responsible party for vote data when IOL and a vendor both touch it?</li>
+        <li>Do the voting rules need to state how answers are used?</li>
+      </ul></div>
+  </div>
+</section>
+
+</div></main>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="Vote in Mzansi's Choice">
+  <div class="mbox">
+    <div id="frameHost"></div>
+    <div class="mside">
+      <h3 id="mHead">Demo vote</h3>
+      <p class="note">This is the real widget. Finish it and your answers appear on the scoreboard behind this window. Nothing is sent anywhere.</p>
+      <ul><li>Your priority adds to "what matters most".</li><li>Your provider adds to the ranking and to that provider's "why".</li></ul>
+      <button class="btn ghost" id="mClose">Close</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const WIDGET_HTML = "<!DOCTYPE html>\n<html lang=\"en-ZA\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>Mzansi's Choice voting widget (300x600)<\/title>\n<style>\n  :root{\n    /* South African flag colours */\n    --blue:#001489; --green:#007749; --gold:#FFB81C; --red:#DE3831; --black:#000000;\n    --navy:#001489; --cream:#FAFAF6; --ink:#0A0F2E;\n    --grey:#505766; --line:#D6D8DE; --pale:#FFF2CC; --palegreen:#E2F3EA; --white:#FFFFFF;\n    --head:Cambria, Georgia, \"Times New Roman\", serif;\n    --body:Arial, Helvetica, sans-serif;\n  }\n  *{box-sizing:border-box}\n  html,body{margin:0;height:100%}\n  body{background:#E9E7E0;display:flex;align-items:center;justify-content:center;font-family:var(--body);color:var(--ink)}\n\n  /* ---------- the 300x600 unit ---------- */\n  #mc{width:300px;height:600px;background:var(--cream);position:relative;overflow:hidden;display:flex;flex-direction:column;\n      box-shadow:0 2px 14px rgba(12,31,63,.18)}\n  #mc button{font-family:var(--body);cursor:pointer}\n  #mc :focus-visible{outline:3px solid var(--blue);outline-offset:2px}\n\n  .bar{height:46px;flex:none;background:var(--blue);position:relative;display:flex;align-items:center;justify-content:space-between;padding:0 14px}\n  .bar::after{content:\"\";position:absolute;left:0;right:0;bottom:0;height:4px;\n    background:linear-gradient(90deg,var(--green) 0 25%,var(--gold) 25% 50%,var(--red) 50% 75%,var(--black) 75% 100%)}\n  .brand{display:flex;align-items:center;gap:8px;color:#fff;font-weight:700;font-size:13px;letter-spacing:.2px}\n  .dot{width:9px;height:9px;border-radius:50%;background:var(--gold)}\n  .cat{font-size:10px;font-weight:700;letter-spacing:.8px;color:var(--gold);text-transform:uppercase}\n\n  .screen{flex:1;min-height:0;display:none;flex-direction:column;padding:16px 16px 12px}\n  .screen.on{display:flex}\n\n  .eyebrow{font-size:10px;font-weight:700;letter-spacing:1px;color:var(--green);text-transform:uppercase}\n  h1{font-family:var(--head);font-size:30px;line-height:1.08;margin:8px 0 10px;color:var(--navy)}\n  h2{font-family:var(--head);font-size:19px;line-height:1.2;margin:6px 0 12px;color:var(--navy)}\n  p{margin:0;font-size:13px;line-height:1.45;color:var(--grey)}\n\n  .chips{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0 0}\n  .chip{font-size:10.5px;font-weight:700;color:var(--ink);background:var(--palegreen);border:1px solid var(--green);border-radius:99px;padding:4px 9px}\n\n  .steps{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-direction:column;gap:5px}\n  .steps li{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--ink)}\n  .steps b{flex:none;width:20px;height:20px;border-radius:50%;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center}\n  .tagline{margin-top:auto;display:inline-block;background:var(--gold);color:var(--black);font-family:var(--head);font-style:italic;font-weight:700;font-size:14px;padding:9px 18px;border-radius:99px;align-self:flex-start;margin-bottom:12px}\n\n  .btn{width:100%;height:46px;border:0;border-radius:23px;background:var(--green);color:#fff;font-weight:700;font-size:14px}\n  .btn:hover{filter:brightness(.97)}\n  .btn.navy{background:var(--green);color:#fff}\n  .btn[disabled]{background:#E3E4E8;color:#6B7180;cursor:not-allowed}\n  .btn.ghost{background:#fff;border:2px solid var(--blue);color:var(--blue)}\n  .link{background:none;border:0;padding:6px;color:var(--green);font-weight:700;font-size:11.5px;text-decoration:underline;align-self:center}\n  .small{font-size:10.5px;color:var(--grey);text-align:center;margin:8px 0 2px}\n\n  /* progress */\n  .prog{display:flex;gap:4px}\n  .prog i{flex:1;height:5px;border-radius:3px;background:#E3E4E8}\n  .prog i.d{background:var(--green)}\n  .meta{font-size:10.5px;font-weight:700;color:var(--grey);margin:8px 0 0;letter-spacing:.3px}\n\n  /* options */\n  .opts{display:flex;flex-direction:column;gap:6px;min-height:0;flex:1;overflow-y:auto;scrollbar-width:none;padding:2px 2px 4px}\n  .opts::-webkit-scrollbar{display:none}\n  .opt{display:flex;align-items:center;gap:10px;width:100%;min-height:40px;padding:6px 10px;text-align:left;font-size:13px;color:var(--ink);\n       background:#fff;border:1.5px solid var(--line);border-radius:10px}\n  .opt:hover{border-color:var(--blue)}\n  .opt .r{flex:none;width:16px;height:16px;border-radius:50%;border:1.5px solid #9AA0AC;background:#fff}\n  .opt[aria-checked=\"true\"]{background:var(--palegreen);border:2px solid var(--green);font-weight:700;padding:5px 9px}\n  .opt[aria-checked=\"true\"] .r{background:var(--green);border-color:var(--green);box-shadow:inset 0 0 0 3px #fff}\n  .opts.prov .opt{min-height:34px;padding:3px 10px}\n  .opts.prov .opt[aria-checked=\"true\"]{padding:2px 9px}\n  .opts.prov{gap:5px}\n  .opts.fade{-webkit-mask-image:linear-gradient(#000 calc(100% - 26px),transparent);mask-image:linear-gradient(#000 calc(100% - 26px),transparent)}\n  .opt .lg{flex:none;width:22px;height:22px;border-radius:5px;background:#E9EBF5;color:var(--blue);font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center}\n\n  .search{width:100%;height:34px;border:1.5px solid var(--line);border-radius:17px;padding:0 12px;font-size:12.5px;font-family:var(--body);color:var(--ink);background:#fff;margin:0 0 8px}\n  .search::placeholder{color:#7B8190}\n  .other{width:100%;height:34px;border:1.5px solid var(--green);border-radius:8px;padding:0 10px;font-size:12.5px;font-family:var(--body);background:#fff;margin:2px 0 4px;display:none}\n  .other.on{display:block}\n  .none{font-size:12px;color:var(--grey);padding:8px 2px}\n\n  .nav{display:flex;gap:8px;align-items:center;margin-top:10px}\n  .nav .btn{flex:1}\n  .back{flex:none;width:46px;height:46px;border-radius:50%;border:2px solid var(--blue);background:#fff;color:var(--blue);font-size:18px;font-weight:700;line-height:1}\n\n  /* done */\n  .tick{width:56px;height:56px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;margin:6px auto 12px}\n  .center{text-align:center}\n  .while{background:#F0F1F5;border-radius:12px;padding:10px 12px;margin:14px 0 12px}\n  .while b{display:block;font-size:10px;letter-spacing:.8px;color:var(--green);margin-bottom:4px}\n  .while a{font-size:13px;font-weight:700;color:var(--navy);text-decoration:none;line-height:1.3}\n  .while a:hover{text-decoration:underline}\n\n  /* sponsor + disclosure */\n  .foot{flex:none;border-top:1px solid var(--line);background:#fff;height:44px;display:flex;flex-direction:column;justify-content:center;padding:0 14px;gap:2px}\n  .spons{display:none;align-items:center;gap:6px;font-size:10px;color:var(--grey)}\n  .spons.on{display:flex}\n  .spons .tag{font-weight:700;letter-spacing:.6px;text-transform:uppercase;border:1px solid var(--line);border-radius:3px;padding:1px 4px;font-size:8.5px}\n  .spons a,.spons span.n{font-weight:700;color:var(--ink);text-decoration:none}\n  .disc{font-size:9.5px;color:var(--grey);line-height:1.25}\n\n  /* info overlay */\n  .info{position:absolute;inset:46px 0 0 0;background:var(--cream);z-index:5;padding:16px;display:none;flex-direction:column}\n  .info.on{display:flex}\n  .info ul{margin:8px 0 12px;padding-left:18px;font-size:12.5px;line-height:1.45;color:var(--grey)}\n  .info li{margin-bottom:6px}\n  .info .btn{margin-top:auto}\n<\/style>\n<\/head>\n<body>\n\n<div id=\"mc\" role=\"region\" aria-label=\"Mzansi's Choice voting widget\">\n  <div class=\"bar\">\n    <div class=\"brand\"><span class=\"dot\"><\/span>Mzansi's Choice<\/div>\n    <div class=\"cat\" id=\"catTag\"><\/div>\n  <\/div>\n\n  <!-- INTRO -->\n  <section class=\"screen on\" id=\"s-intro\">\n    <div class=\"eyebrow\" id=\"introCat\"><\/div>\n    <h1>What would you choose?<\/h1>\n    <p id=\"introCopy\"><\/p>\n    <div class=\"chips\"><span class=\"chip\">Free<\/span><span class=\"chip\">No sign-up<\/span><span class=\"chip\" id=\"chipTime\"><\/span><\/div>\n    <ol class=\"steps\" id=\"steps\"><\/ol>\n    <div class=\"tagline\">You choose. Mzansi decides.<\/div>\n    <button class=\"btn\" id=\"startBtn\">Start voting<\/button>\n    <div class=\"small\" id=\"closes\"><\/div>\n    <button class=\"link\" id=\"howBtn\">How voting works<\/button>\n  <\/section>\n\n  <!-- QUESTION -->\n  <section class=\"screen\" id=\"s-q\" aria-live=\"polite\">\n    <div class=\"prog\" id=\"prog\" aria-hidden=\"true\"><\/div>\n    <div class=\"meta\" id=\"meta\"><\/div>\n    <h2 id=\"qText\"><\/h2>\n    <input class=\"search\" id=\"search\" type=\"search\" placeholder=\"Search all providers\" aria-label=\"Search providers\" style=\"display:none\">\n    <div class=\"opts\" id=\"opts\" role=\"radiogroup\" aria-labelledby=\"qText\"><\/div>\n    <input class=\"other\" id=\"otherTxt\" maxlength=\"40\" placeholder=\"Type the provider you would choose\" aria-label=\"Other provider\">\n    <div class=\"nav\">\n      <button class=\"back\" id=\"backBtn\" aria-label=\"Previous question\">&#8592;<\/button>\n      <button class=\"btn navy\" id=\"nextBtn\" disabled>Next<\/button>\n    <\/div>\n  <\/section>\n\n  <!-- DONE -->\n  <section class=\"screen\" id=\"s-done\">\n    <div class=\"tick\" aria-hidden=\"true\">&#10003;<\/div>\n    <h2 class=\"center\" id=\"doneH\" style=\"margin-top:0\">Your vote is in<\/h2>\n    <p class=\"center\" id=\"doneCopy\"><\/p>\n    <div class=\"while\"><b>WHILE YOU WAIT<\/b><a id=\"whileLink\" href=\"#\" target=\"_blank\" rel=\"noopener\"><\/a><\/div>\n    <button class=\"btn ghost\" id=\"shareBtn\">Share Mzansi's Choice<\/button>\n    <a class=\"link\" id=\"hubLink\" href=\"#\" target=\"_blank\" rel=\"noopener\" style=\"margin-top:auto\">Visit the Mzansi's Choice hub<\/a>\n  <\/section>\n\n  <!-- ALREADY VOTED -->\n  <section class=\"screen\" id=\"s-voted\">\n    <div class=\"tick\" aria-hidden=\"true\">&#10003;<\/div>\n    <h2 class=\"center\" style=\"margin-top:0\">You have already voted<\/h2>\n    <p class=\"center\" id=\"votedCopy\"><\/p>\n    <div class=\"while\"><b>WHILE YOU WAIT<\/b><a id=\"whileLink2\" href=\"#\" target=\"_blank\" rel=\"noopener\"><\/a><\/div>\n    <a class=\"link\" id=\"hubLink2\" href=\"#\" target=\"_blank\" rel=\"noopener\" style=\"margin-top:auto\">Visit the Mzansi's Choice hub<\/a>\n  <\/section>\n\n  <div class=\"foot\">\n    <div class=\"spons\" id=\"spons\"><span class=\"tag\">Advert<\/span><span id=\"sponsTxt\"><\/span><\/div>\n    <div class=\"disc\">Advertising never influences the vote.<\/div>\n  <\/div>\n\n  <!-- HOW IT WORKS -->\n  <div class=\"info\" id=\"info\" role=\"dialog\" aria-label=\"How voting works\">\n    <div class=\"eyebrow\">How voting works<\/div>\n    <h2>Short, free and fair<\/h2>\n    <ul>\n      <li>Answer a few quick questions, then choose the provider you would pick.<\/li>\n      <li>One valid vote per category per participant, subject to the agreed validation method.<\/li>\n      <li>Every provider in the category can be chosen, not only advertisers.<\/li>\n      <li>Results are published on IOL after voting closes, with the method explained.<\/li>\n      <li>Results reflect valid responses from participating IOL audiences, not all South Africans.<\/li>\n    <\/ul>\n    <a class=\"link\" id=\"rulesLink\" href=\"#\" target=\"_blank\" rel=\"noopener\">Read the full voting rules<\/a>\n    <button class=\"btn navy\" id=\"closeInfo\">Got it<\/button>\n  <\/div>\n<\/div>\n\n<script>\n/* =====================================================================\n   CAMPAIGN CONFIG: edit this block per campaign. Nothing else needs to change.\n   ===================================================================== */\nconst CONFIG = {\n  campaign: 'insurance-car',\n  category: 'Car insurance',\n  closes: '[closing date TBC]',\n  hubUrl: 'https://www.iol.co.za/',               // TODO: Mzansi's Choice hub URL\n  rulesUrl: 'https://www.iol.co.za/',             // TODO: voting rules page\n  relatedText: 'Read: how to compare car insurance',\n  relatedUrl: 'https://www.iol.co.za/',           // TODO: related IOL article\n  endpoint: '',                                    // TODO: vote-collection URL. Empty = demo mode (nothing is sent)\n  // Optional labelled advertiser presence during the voting period. Leave name empty to hide.\n  sponsor: { label: 'Presented by', name: '[Advertiser name]', url: '' },\n  questions: [\n    { id: 'priority', short: 'What matters most', type: 'single', text: 'What matters most when you choose car insurance?',\n      options: ['Monthly premium', 'Excess amount', 'How easy claims are', 'Roadside assistance', 'Insurer reputation'] },\n    { id: 'channel', short: 'How you buy your cover', type: 'single', text: 'How do you usually buy your cover?',\n      options: ['Directly from an insurer', 'Through a broker', 'Using a comparison site', 'Through my bank or employer', 'Not sure'] },\n    { id: 'compare', short: 'How often you compare', type: 'single', text: 'How often do you compare quotes?',\n      options: ['Every year', 'Every few years', 'Only when my premium jumps', 'Rarely or never'] },\n    { id: 'provider', short: 'The provider you would choose', type: 'provider', text: 'Which provider would you choose for car insurance?',\n      // Placeholder names. The live list must include every provider in the category, not only advertisers.\n      providers: ['[Provider A]', '[Provider B]', '[Provider C]', '[Provider D]', '[Provider E]', '[Provider F]', '[Provider G]', '[Provider H]'] }\n  ]\n};\n/* ===================================================================== */\n\n(function(){\n  const $ = id => document.getElementById(id);\n  const Q = CONFIG.questions, N = Q.length;\n\n  const safe = {\n    get(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } },\n    set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }\n  };\n  const shuffle = a => { a = a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };\n  const initials = n => n.replace(/[\\[\\]]/g,'').split(/\\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase();\n\n  const answers = {}; let idx = 0; let providerOrder = shuffle(Q[N-1].providers);\n\n  // static text\n  $('catTag').textContent = CONFIG.category;\n  $('introCat').textContent = CONFIG.category;\n  const cols = ['var(--green)','#8A6200','var(--red)','var(--blue)'];\n  $('steps').innerHTML = Q.map((q,i)=>'<li><b style=\"background:'+cols[i%4]+'\">'+(i+1)+'<\/b><span>'+q.short+'<\/span><\/li>').join('');\n  $('introCopy').textContent = N + ' quick questions on everyday cover, ending with the provider you would choose.';\n  $('chipTime').textContent = '60\u201390 seconds';\n  $('closes').textContent = 'Voting closes ' + CONFIG.closes;\n  [$('hubLink'),$('hubLink2')].forEach(a=>a.href=CONFIG.hubUrl);\n  [$('whileLink'),$('whileLink2')].forEach(a=>{a.href=CONFIG.relatedUrl;a.textContent=CONFIG.relatedText;});\n  $('rulesLink').href = CONFIG.rulesUrl;\n  $('doneCopy').textContent = 'Thank you for taking part. Results will be published on IOL after voting closes ' + CONFIG.closes + '.';\n  $('votedCopy').textContent = 'Thank you for taking part. Results will be published on IOL after voting closes ' + CONFIG.closes + '.';\n  if (CONFIG.sponsor && CONFIG.sponsor.name) {\n    $('spons').classList.add('on');\n    const t = $('sponsTxt'); t.textContent = CONFIG.sponsor.label + ' ';\n    const n = document.createElement(CONFIG.sponsor.url ? 'a' : 'span');\n    if (CONFIG.sponsor.url){ n.href = CONFIG.sponsor.url; n.target = '_blank'; n.rel = 'noopener sponsored'; } else { n.className = 'n'; }\n    n.textContent = CONFIG.sponsor.name; t.appendChild(n);\n  }\n\n  function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on', s.id===id)); }\n\n  function renderQ(){\n    const q = Q[idx];\n    $('prog').innerHTML = Q.map((_,i)=>'<i class=\"'+(i<=idx?'d':'')+'\"><\/i>').join('');\n    $('meta').textContent = 'Question ' + (idx+1) + ' of ' + N;\n    $('qText').textContent = q.text;\n    $('nextBtn').textContent = idx === N-1 ? 'Submit my vote' : 'Next';\n    $('backBtn').style.display = idx === 0 ? 'none' : 'block';\n    const isProv = q.type === 'provider';\n    $('search').style.display = isProv ? 'block' : 'none';\n    $('search').value = '';\n    $('otherTxt').classList.remove('on');\n    $('otherTxt').value = (answers.providerOther || '');\n    renderOpts();\n    syncNext();\n    $('qText').focus && $('qText').setAttribute('tabindex','-1');\n  }\n\n  function renderOpts(){\n    const q = Q[idx], box = $('opts'); box.innerHTML = '';\n    box.classList.toggle('prov', q.type === 'provider');\n    const isProv = q.type === 'provider';\n    let list = isProv ? providerOrder.concat(['Other / not listed']) : q.options;\n    if (isProv){\n      const term = $('search').value.trim().toLowerCase();\n      if (term) list = list.filter(x => x === 'Other / not listed' || x.toLowerCase().includes(term));\n    }\n    list.forEach(label => {\n      const b = document.createElement('button');\n      b.type = 'button'; b.className = 'opt'; b.setAttribute('role','radio');\n      b.setAttribute('aria-checked', answers[q.id] === label ? 'true' : 'false');\n      b.innerHTML = '<span class=\"r\"><\/span>' + (isProv && label !== 'Other / not listed' ? '<span class=\"lg\"><\/span>' : '') + '<span><\/span>';\n      b.lastChild.textContent = label;\n      if (isProv && label !== 'Other / not listed') b.querySelector('.lg').textContent = initials(label);\n      b.addEventListener('click', () => {\n        answers[q.id] = label;\n        box.querySelectorAll('.opt').forEach(o => o.setAttribute('aria-checked', o===b ? 'true':'false'));\n        const other = isProv && label === 'Other / not listed';\n        $('otherTxt').classList.toggle('on', other);\n        if (other) $('otherTxt').focus();\n        syncNext();\n      });\n      box.appendChild(b);\n    });\n    if (!list.length){ const d=document.createElement('div'); d.className='none'; d.textContent='No match. Choose \"Other / not listed\" to add one.'; box.appendChild(d); }\n    if (isProv && answers[q.id] === 'Other / not listed') $('otherTxt').classList.add('on');\n    box.scrollTop = 0; updFade();\n  }\n  function updFade(){ const b = $('opts'); b.classList.toggle('fade', b.scrollHeight - b.scrollTop - b.clientHeight > 4); }\n  $('opts').addEventListener('scroll', updFade);\n\n  function syncNext(){\n    const q = Q[idx]; let ok = !!answers[q.id];\n    if (q.type === 'provider' && answers[q.id] === 'Other / not listed') ok = true; // typed name optional\n    $('nextBtn').disabled = !ok;\n  }\n\n  function submit(){\n    if (answers.provider === 'Other / not listed') answers.providerOther = $('otherTxt').value.trim().slice(0,40);\n    const payload = { campaign: CONFIG.campaign, category: CONFIG.category, answers: answers, submittedAt: new Date().toISOString() };\n    // Host pages can listen for this event.\n    window.dispatchEvent(new CustomEvent('mzansis-choice:vote', { detail: payload }));\n    // When embedded in the hub (iframe), pass the vote up so the demo scoreboard can show it.\n    try{ if (window.parent && window.parent !== window) window.parent.postMessage({ source:'mzansis-choice', type:'vote', payload: payload }, '*'); }catch(e){}\n    if (CONFIG.endpoint){\n      try{ fetch(CONFIG.endpoint, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload), keepalive:true }).catch(()=>{}); }catch(e){}\n    } else { console.log('[Mzansi\\'s Choice demo mode: vote not sent]', payload); }\n    // Demo build: no \"already voted\" flag is stored. Real one-vote-per-person validation must be handled server-side.\n    show('s-done');\n  }\n\n  $('startBtn').addEventListener('click', () => { idx = 0; show('s-q'); renderQ(); });\n  $('nextBtn').addEventListener('click', () => { if (idx < N-1){ idx++; renderQ(); } else submit(); });\n  $('backBtn').addEventListener('click', () => { if (idx > 0){ idx--; renderQ(); } });\n  $('search').addEventListener('input', renderOpts);\n  $('howBtn').addEventListener('click', () => { $('info').classList.add('on'); $('closeInfo').focus(); });\n  $('closeInfo').addEventListener('click', () => { $('info').classList.remove('on'); $('howBtn').focus(); });\n  document.addEventListener('keydown', e => { if (e.key === 'Escape') $('info').classList.remove('on'); });\n  $('shareBtn').addEventListener('click', async () => {\n    const data = { title: \"Mzansi's Choice\", text: 'I just voted in Mzansi\\'s Choice. What would you choose?', url: CONFIG.hubUrl };\n    try{\n      if (navigator.share) await navigator.share(data);\n      else { await navigator.clipboard.writeText(data.text + ' ' + data.url); $('shareBtn').textContent = 'Link copied'; setTimeout(()=>$('shareBtn').textContent=\"Share Mzansi's Choice\",2000); }\n    }catch(e){}\n  });\n\n  // Demo build: nothing is remembered, so a refresh always starts again at the intro screen.\n})();\n<\/script>\n<\/body>\n<\/html>\n";
+(function(){
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const MINP = 100, MINC = 30;
+$('minP').textContent = MINP; $('minC').textContent = MINC;
+
+/* ---------- configuration ---------- */
+const PROVIDERS = ['[Provider A]','[Provider B]','[Provider C]','[Provider D]','[Provider E]','[Provider F]','[Provider G]','[Provider H]'];
+// Each window has at most MAXQ questions in total: "what matters most", up to MAXQ-2 window-specific questions, and the provider choice.
+const MAXQ = 5;
+const Q_BUY = { id:'channel', short:'How you buy your cover', text:'How do you usually buy your cover?', opts:['Directly from an insurer','Through a broker','Using a comparison site','Through my bank or employer','Not sure'] };
+const Q_CMP = { id:'compare', short:'How often you compare', text:'How often do you compare quotes?', opts:['Every year','Every few years','Only when my premium jumps','Rarely or never'] };
+const SUBS = [
+  { id:'car',       name:'Car',       noun:'car insurance',       color:'#001489', from:1, to:7,  seed:11, maxN:7400, qs:[Q_BUY, Q_CMP], crits:['Monthly premium','Excess amount','How easy claims are','Roadside assistance','Insurer reputation'] },
+  { id:'home',      name:'Home',      noun:'home insurance', color:'#007749', from:8, to:14, seed:23, maxN:6100, qs:[{ id:'tenure', short:'Own or rent', text:'Do you own or rent your home?', opts:['I own it','I rent it','Other'] }, Q_BUY], crits:['Monthly premium','What is covered','How easy claims are','Home emergency help','Insurer reputation'] },
+  { id:'life',      name:'Life',      noun:'life insurance',      color:'#DE3831', from:15, to:21, seed:41, maxN:5600, qs:[{ id:'reason', short:'Main reason for cover', text:'What is your main reason for life cover?', opts:['Protect my family','Cover my debts','Savings or investment','It comes with my job'] }, { id:'review', short:'How often you review', text:'How often do you review your cover?', opts:['Every year','Every few years','Only after a life event','Never'] }], crits:['Monthly premium','Payout amount','How easy claims are','Cover that grows with me','Insurer reputation'] },
+  { id:'funeral',   name:'Funeral',   noun:'funeral cover',       color:'#0b0b0b', from:22, to:28, seed:53, maxN:5100, qs:[{ id:'who', short:'Who is covered', text:'Who would you cover?', opts:['Myself','My partner and children','Extended family','My parents'] }, { id:'pay', short:'How you pay', text:'How do you prefer to pay?', opts:['Debit order','Salary deduction','Cash or in person','Not sure'] }], crits:['Monthly premium','Payout speed','Family members covered','Waiting periods','Provider reputation'] },
+  { id:'pet',       name:'Pet',       noun:'pet insurance',       color:'#FF741F', from:29, to:35, seed:37, maxN:4300, qs:[{ id:'pet', short:'Your pets', text:'Which pets do you have or plan to insure?', opts:['Dog','Cat','Dog and cat','Other or none yet'] }, { id:'status', short:'Cover today', text:'Do you have pet insurance today?', opts:['Yes','No, but I am considering it','No'] }], crits:['Monthly premium','Vet bills covered','How easy claims are','Waiting periods','Insurer reputation'] }
+];
+const RGB = () => getComputedStyle(document.documentElement).getPropertyValue('--rgb').trim();
+const SHADE = ['#1f2a6b', '#7a83b3'];
+const RUN_START = new Date(2027, 1, 1), RUN_LEN = 35, MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const dayDate = n => new Date(RUN_START.getFullYear(), RUN_START.getMonth(), RUN_START.getDate() + n - 1);
+const dateOf = n => { const d = dayDate(n); return d.getDate() + ' ' + MON[d.getMonth()]; };
+const dateY = n => dateOf(n) + ' ' + dayDate(n).getFullYear();
+const isoOf = n => { const d = dayDate(n); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+const span = s => dateOf(s.from) + ' to ' + dateOf(s.to);
+const PILLARS = [
+  { name:'Insurance', subs:['Car insurance','Home insurance','Life insurance','Funeral cover','Pet insurance'] },
+  { name:'Travel & Leisure', subs:['Airline','Hotel / resort','Weekend getaway','Travel booking platform','Adventure experience'] },
+  { name:'Beauty & Personal Care', subs:['Skincare brand','Haircare brand','Beauty and cosmetics brand','Fragrance brand',"Men's grooming brand"] },
+  { name:'Motoring', subs:['New car','SUV','Bakkie','Electric / hybrid vehicle','Car for South African roads'] },
+  { name:'Home & Lifestyle', subs:['Home improvement brand','Appliance brand','Furniture brand','Home security company','Home & garden brand'] },
+  { name:'Banking & Financial Services', subs:['Bank','Digital banking app','Personal loan provider','Savings account','Home loan provider'] },
+  { name:'Food & Grocery', subs:['Supermarket','Grocery delivery','Fast-food brand','Restaurant chain','Coffee brand'] },
+  { name:'Telecommunications & Technology', subs:['Mobile network','Fibre / internet provider','Tech brand','Smartphone','Streaming service'] },
+  { name:'Retail & Shopping', subs:['Online store','Fashion retailer','Beauty retailer','Home & lifestyle retailer','Shopping centre'] },
+  { name:'Mzansi Choice', subs:['Value for money','Customer service','Trust','South African brand','Brand you would recommend to a friend'] }
+];
+PILLARS.forEach((p, i) => { p.from = i * RUN_LEN + 1; p.to = (i + 1) * RUN_LEN; p.on = i === 0; });
+let railSel = 0;
+const CLIENTS = {
+  car:{ who:['Insurers and brokers','Vehicle tracking','Vehicle finance','Tyre and service networks','Comparison sites'],
+        wants:'Be seen by people who are about to renew or have just had a premium jump.', route:'Window presenter, MPU and half-page, sponsored guide on comparing cover.', open:'Which part of the car decision do you want to own: price, claims or trust?' },
+  home:{ who:['Insurers and brokers','Home security','Solar and home improvement','Banks and home loans','Comparison sites'],
+        wants:'Reach owners and renters while they review cover.', route:'Window presenter, MPU, sponsored guide on buildings vs contents.', open:'Are you speaking to owners, renters, or both?' },
+  pet:{ who:['Pet insurers','Pet retail and food','Vets and pet care groups','Pet-friendly financial products'],
+        wants:'Meet a passionate, emotionally engaged audience early in the pet-owning journey.', route:'Window presenter, native content, sponsored in-feed tile.', open:'Do you want new pet owners or those with an existing policy?' },
+  life:{ who:['Life insurers','Banks and financial services','Financial advisers','Employee benefit providers'],
+        wants:'Build trust in a considered, high-value decision.', route:'Pillar partner leaderboard, sponsored explainers, results presenter.', open:'What would make a first-time buyer trust you?' },
+  funeral:{ who:['Funeral cover providers','Banks and financial services','Retail-linked cover brands','Community and family services'],
+        wants:'Be present in a sensitive, high-trust category with tone to match.', route:'Window presenter and sponsored guide only, with a light-touch tone.', open:'How should your brand sound in this moment?' }
+};
+const PLACEMENTS = [
+  { n:1, name:'Pillar partner leaderboard', size:'970x250 or 728x90', ph:['before','during','after'], rule:'One brand for the whole pillar run (five weeks). Sits above the hub, outside the board.' },
+  { n:2, name:'Window presenter', size:'Label and logo in the calendar', ph:['before','during'], rule:'Names a sub-pillar window, for example "Pet window presented by…". Open decision below.' },
+  { n:3, name:'Half-page', size:'300x600', ph:['during'], rule:'Beside the scoreboard while voting is open.' },
+  { n:4, name:'MPU', size:'300x250', ph:['during'], rule:'Below "what matters most".' },
+  { n:5, name:'Sponsored in-feed guide', size:'Native tile', ph:['before','during','after'], rule:'Content partnership, labelled Sponsored. Editorial controls the page.' },
+  { n:6, name:'Results presenter', size:'Label and logo', ph:['after'], rule:'Presents the published results, and carries on through the open-voting period. Never implies a provider won.' }
+];
+const LEVELS = ['','Everyone who votes: no name, no email.','Adds short optional questions that people can skip.','Adds an opt-in identity (email or login) for people who want contact or results.'];
+const DATA = [
+  { l:1, n:'Chosen provider, and "other" write-in', w:'Widget · anonymous', v:'The core result: the most popular provider as chosen by Mzansi.', r:'low', t:'Pilot' },
+  { l:1, n:'What matters most when choosing', w:'Widget · anonymous', v:'The "why" layer: explains each provider\'s position. Strongest client and editorial insight.', r:'low', t:'Pilot' },
+  { l:1, n:'How people buy cover', w:'Widget · anonymous', v:'Channel planning for insurers, brokers and banks.', r:'low', t:'Pilot' },
+  { l:1, n:'How often they compare quotes', w:'Widget · anonymous', v:'Shows how contestable the category is.', r:'low', t:'Pilot' },
+  { l:1, n:'Window, sub-pillar and time of vote', w:'Widget · system', v:'Trends over the window and across the pillar run.', r:'low', t:'Pilot' },
+  { l:1, n:'Entry source: article, campaign tag, referrer', w:'Hub and widget · system', v:'Shows which content drives votes, and what editorial should do more of.', r:'low', t:'Pilot' },
+  { l:1, n:'Hub behaviour: windows viewed, "why" panels opened, filters used', w:'Hub · aggregate analytics', v:'Which questions interest people. Informs product and sales.', r:'low', t:'Pilot' },
+  { l:1, n:'Device type and broad location from the network', w:'Hub and widget · system', v:'Audience mix and fraud checks. Raw network address would not be kept or shown.', r:'med', t:'Pilot, once Legal agrees' },
+  { l:2, n:'Current provider alongside preferred provider', w:'Widget · optional', v:'Shows who is vulnerable and who is gaining. The most valuable client question.', r:'med', t:'Phase 2' },
+  { l:2, n:'Renewal month', w:'Widget · optional', v:'Lets clients time campaigns to when people decide.', r:'med', t:'Phase 2' },
+  { l:2, n:'Province and age band', w:'Widget · optional', v:'Segments the results. Bands only, never exact age.', r:'med', t:'Phase 2' },
+  { l:2, n:'Ownership screener: car, home, pet, dependants', w:'Widget · optional', v:'Confirms the voter is relevant to the window.', r:'med', t:'Phase 2' },
+  { l:3, n:'Email or login for "send me the results"', w:'Hub · opt-in', v:'Builds a first-party audience and a reason to return.', r:'high', t:'Phase 3' },
+  { l:3, n:'Opt-in to hear from partner brands', w:'Hub · opt-in, recorded', v:'Qualified leads for clients, at the voter\'s choice. Needs clear wording.', r:'high', t:'Phase 3' },
+  { l:3, n:'90-day follow-up: "did you switch?"', w:'Email · opt-in', v:'Turns opinion into behaviour. Proof that Mzansi\'s Choice moves markets.', r:'high', t:'Phase 3' }
+];
+
+
+const CONTENT = {
+  car:{ before:['How car insurance excess works','What to check before you renew','Comprehensive or third party: what you are actually covered for'], after:['What the car insurance results tell us','Voters on how they buy cover','What matters most, window by window'], spons:'Sponsored guide: a partner\'s tips on comparing car cover' },
+  home:{ before:['Buildings or contents cover: what is the difference?','What home emergency cover means','Renting: do you need contents cover?'], after:['What the home insurance results tell us','Owners and renters: what each group put first','What matters most, window by window'], spons:'Sponsored guide: a partner\'s home protection checklist' },
+  pet:{ before:['What pet insurance does and does not cover','Waiting periods explained','Planning for vet bills'], after:['What the pet insurance results tell us','Dog and cat owners: what each group put first','What matters most, window by window'], spons:'Sponsored guide: a partner\'s pet care essentials' },
+  life:{ before:['Life cover or funeral cover: which is which?','Reviewing your cover after a big life event','Reading the small print on payouts'], after:['What the life insurance results tell us','Why people choose cover: voters\' reasons','What matters most, window by window'], spons:'Sponsored guide: a partner\'s plain-language guide to life cover' },
+  funeral:{ before:['Who can you cover on one policy?','What a waiting period means for your family','How funeral cover payouts work'], after:['What the funeral cover results tell us','Who South Africans cover, and how they pay','What matters most, window by window'], spons:'Sponsored guide: a partner\'s guide to planning ahead' }
+};
+const tag = (s, lane, n) => '?utm_source=mzansis-choice&utm_medium=hub&utm_campaign=insurance-' + s.id + '&utm_content=' + lane + '-' + n;
+
+/* ---------- state ---------- */
+let day = 9, mode = 'live', selSub = null, filter = null, view = 'list', phase = 'before', level = 1, cmSub = 'car';
+const expanded = new Set(), extras = {}, arrows = {}, prevRank = {}; let meMark = null, lastVote = null;
+SUBS.forEach(s => { extras[s.id] = []; });
+const lateX = {}; SUBS.forEach(s => { lateX[s.id] = []; }); let lateView = false;
+const statusOf = s => day < s.from ? 'soon' : (day > s.to ? 'closed' : 'live');
+const liveSub = () => SUBS.find(s => statusOf(s) === 'live');
+const subById = id => SUBS.find(s => s.id === id);
+
+/* ---------- synthetic data ---------- */
+function mulberry(a){ return function(){ a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function pick(w, r){ let t = 0; for (const x of w) t += x; let u = r * t; for (let i = 0; i < w.length; i++){ u -= w[i]; if (u <= 0) return i; } return w.length - 1; }
+function profile(s){
+  const r = mulberry(s.seed * 7919);
+  const base = [.22,.18,.15,.13,.11,.09,.07,.05].map(x => x * (0.8 + r() * 0.5));
+  base.sort(() => r() - .5);
+  const critW = s.crits.map((_, i) => [.30,.14,.26,.12,.18][i] * (0.8 + r() * 0.4));
+  const aff = PROVIDERS.map(() => s.crits.map(() => 0.8 + r() * 0.4));
+  PROVIDERS.forEach((_, p) => {
+    aff[p][Math.floor(r() * 5)] *= 2.1;
+    if (r() > .35) aff[p][Math.floor(r() * 5)] *= 0.45;
+  });
+  const qW = s.qs.map(q => q.opts.map(() => 0.4 + r()));
+  return { base, critW, aff, qW };
+}
+const PROF = {}; SUBS.forEach(s => PROF[s.id] = profile(s));
+// Late voters are self-selected, so their preferences drift a little from the official window's.
+const PROF_LATE = {}; SUBS.forEach(s => { const r = mulberry(s.seed * 31), P = PROF[s.id]; PROF_LATE[s.id] = Object.assign({}, P, { base:P.base.map(b => b * (0.55 + r() * 1.0)) }); });
+const blank = s => ({ n:0, crit:s.crits.map(() => 0), prov:PROVIDERS.map(() => 0), pc:PROVIDERS.map(() => s.crits.map(() => 0)), x:s.qs.map(q => q.opts.map(() => 0)), other:0 });
+function addTo(c, v){ c.n++; c.crit[v.c]++; v.x.forEach((o, i) => { c.x[i][o]++; }); if (v.p >= 0){ c.prov[v.p]++; c.pc[v.p][v.c]++; } else c.other++; }
+function sampleVote(s, r, late){ const P = late ? PROF_LATE[s.id] : PROF[s.id]; const c = pick(P.critW, r()); const p = pick(P.base.map((b, i) => b * P.aff[i][c]), r()); return { c, p, x:P.qW.map(w => pick(w, r())) }; }
+const cache = {};
+function build(s){
+  const key = s.id + ':' + day + ':' + extras[s.id].length + ':' + lateX[s.id].length;
+  if (cache[s.id] && cache[s.id].key === key) return cache[s.id];
+  const st = statusOf(s); const len = s.to - s.from + 1;
+  let nCur = 0, nPrev = 0;
+  if (st === 'closed'){ nCur = nPrev = s.maxN; }
+  else if (st === 'live'){ nCur = Math.round(s.maxN * (day - s.from + 1) / len); nPrev = Math.round(s.maxN * (day - s.from) / len); }
+  const r = mulberry(s.seed), cur = blank(s), prev = blank(s);
+  for (let i = 0; i < nCur; i++){ const v = sampleVote(s, r); addTo(cur, v); if (i < nPrev) addTo(prev, v); }
+  extras[s.id].forEach(v => addTo(cur, v));
+  const late = blank(s);
+  if (st === 'closed'){ const nL = Math.min(Math.round(s.maxN * 0.5), Math.round(s.maxN * 0.03 * (day - s.to))), rl = mulberry(s.seed + 999); for (let i = 0; i < nL; i++) addTo(late, sampleVote(s, rl, true)); lateX[s.id].forEach(v => addTo(late, v)); }
+  return cache[s.id] = { key, cur, prev, late };
+}
+const visible = s => { const st = statusOf(s), b = build(s); if (st === 'closed' && lateView) return b.late; return (mode === 'delayed' && st === 'live') ? b.prev : b.cur; };
+const pct = (a, b) => b ? Math.round(a / b * 100) : 0;
+const idx = (c, p, k) => { const np = c.prov[p]; if (!np || !c.n) return null; const drv = c.pc[p][k] / np, base = c.crit[k] / c.n; return base ? drv / base * 100 : null; };
+
+function drivers(s, c, p){
+  if (c.prov[p] < MINP) return null;
+  const arr = s.crits.map((name, k) => ({ k, name, cell:c.pc[p][k], share:pct(c.pc[p][k], c.prov[p]), all:pct(c.crit[k], c.n), ix:idx(c, p, k) }));
+  const ok = arr.filter(a => a.cell >= MINC && a.ix != null).sort((a, b) => b.ix - a.ix);
+  return { arr, ok };
+}
+function sentence(s, c, p){
+  const d = drivers(s, c, p), nm = PROVIDERS[p];
+  if (!d || !d.ok.length) return nm + ' needs more votes before its "why" can be shown (at least ' + MINP + ' votes, and ' + MINC + ' in an answer group).';
+  const top = d.ok[0]; let t = '<b>' + esc(nm) + '</b> is in the running mainly on <b>' + esc(top.name.toLowerCase()) + '</b>: ' + top.share + '% of its voters put it first, against ' + top.all + '% of all voters (' + (top.ix / 100).toFixed(1) + '× the average).' + ' <span class="muted">Evidence: ' + top.cell.toLocaleString('en-ZA') + ' of its ' + c.prov[p].toLocaleString('en-ZA') + ' voters, against ' + c.crit[top.k].toLocaleString('en-ZA') + ' of all ' + c.n.toLocaleString('en-ZA') + ' voters.</span>';
+  if (d.ok.length > 2){ const s2 = d.ok[1]; if (s2.ix > 105) t += ' It is also stronger than average on <b>' + esc(s2.name.toLowerCase()) + '</b> (' + (s2.ix / 100).toFixed(1) + '×).'; }
+  const low = d.ok[d.ok.length - 1]; if (low.ix < 85) t += ' Voters who put <b>' + esc(low.name.toLowerCase()) + '</b> first pick it less often (' + (low.ix / 100).toFixed(1) + '×).';
+  return t;
+}
+
+/* ---------- render: rail, calendar, windows ---------- */
+function renderTop(){
+  $('rail').innerHTML = PILLARS.map((p, i) => '<button class="pl ' + (i === 0 ? 'on' : 'off') + (railSel === i ? ' sel' : '') + '" data-pillar="' + i + '" title="' + (i === 0 ? 'Pilot pillar, live in this demo' : 'Planned pillar. Dates are proposals until EXCO confirms.') + '">' + esc(p.name) + '<small>' + (i === 0 ? 'Pilot · ' : '') + esc(dateOf(p.from) + ' to ' + dateOf(p.to)) + '</small></button>').join('') + '<span class="note">Order and dates are proposals until EXCO confirms them.</span>';
+  const P = PILLARS[railSel];
+  $('railDetail').innerHTML = railSel === 0 ? '' : '<div class="card" style="margin-bottom:16px"><div class="eyebrow">Planned pillar</div><h3>' + esc(P.name) + '</h3><p class="note">Runs ' + esc(dateY(P.from) + ' to ' + dateY(P.to)) + '. Five 7-day windows, one after another. Questions and provider lists are drafted and locked before this run starts. Every provider in each category can be chosen.</p><div class="wins">' + P.subs.map((n, k) => '<div class="sub"><b>' + esc(n) + '</b><span>' + esc(dateOf(P.from + k * 7) + ' to ' + dateOf(P.from + k * 7 + 6)) + '</span></div>').join('') + '</div></div>';
+  $('wins').innerHTML = SUBS.map(s => {
+    const st = statusOf(s), left = s.to - day + 1;
+    const pill = st === 'live' ? '<span class="pill live"><span class="dot"></span>LIVE · ' + left + (left === 1 ? ' day' : ' days') + ' left</span>' : st === 'closed' ? '<span class="pill closed">CAMPAIGN RESULT</span>' : '<span class="pill soon">Opens ' + dateOf(s.from) + '</span>';
+    return '<button class="sub ' + (selSub === s.id ? 'on' : '') + '" data-sub="' + s.id + '"><b>' + s.name + '</b><span>' + span(s) + '</span><br>' + pill + '</button>';
+  }).join('');
+  $('dayN').textContent = day + ' (' + dateOf(day) + ')';
+}
+
+
+function ranks(c){ return PROVIDERS.map((_, p) => p).sort((a, b) => c.prov[b] - c.prov[a]); }
+function movedPanel(s){
+  const b = build(s), ro = ranks(b.cur), rl = ranks(b.late), lateN = b.late.n;
+  if (lateN < MINP) return '<div class="sent" style="margin:10px 0">Open votes are still coming in (' + lateN + ' so far). A comparison appears once there are enough to be meaningful.</div>';
+  const rows = ro.map((p, i) => { const j2 = rl.indexOf(p), d = i - j2; return '<tr><td>' + (i + 1) + '</td><td><b>' + esc(PROVIDERS[p]) + '</b></td><td>' + (j2 + 1) + '</td><td>' + (d > 0 ? '<span class="up">▲ ' + d + '</span>' : d < 0 ? '<span class="dn">▼ ' + (-d) + '</span>' : '<span class="muted">same</span>') + '</td></tr>'; }).join('');
+  return '<div class="sent" style="margin:10px 0"><b>Has it moved?</b> Campaign winner: <b>' + esc(PROVIDERS[ro[0]]) + '</b>. Leader in open voting: <b>' + esc(PROVIDERS[rl[0]]) + '</b>' + (ro[0] === rl[0] ? ' (the same).' : ' (different).') + ' <span class="muted">Open voters choose themselves, so this shows direction rather than a like-for-like comparison. The campaign result never changes.</span></div><details><summary class="note" style="cursor:pointer">Rank by rank</summary><table><thead><tr><th>Campaign</th><th>Provider</th><th>Open voting</th><th>Moved</th></tr></thead><tbody>' + rows + '</tbody></table></details>';
+}
+/* ---------- render: board ---------- */
+function renderBoard(track){
+  const s = subById(selSub), st = statusOf(s), c = visible(s), len = s.to - s.from + 1;
+  const stPill = st === 'live' ? '<span class="pill live"><span class="dot"></span>LIVE</span>' : st === 'closed' ? '<span class="pill closed">CAMPAIGN RESULT</span>' : '<span class="pill soon">OPENS ' + dateOf(s.from).toUpperCase() + '</span>';
+  let h = '<div class="board-h"><div><div class="eyebrow">Scoreboard · ' + esc(s.name) + ' window</div><h3>Who is Mzansi choosing for ' + esc(s.noun) + '?</h3></div><div>' + stPill + '</div></div>';
+  if (st === 'soon'){
+    h += '<div class="locked"><h4>Voting opens on ' + dateOf(s.from) + '</h4><p class="muted">In ' + (s.from - day) + (s.from - day === 1 ? ' day' : ' days') + '. Voters will be asked what matters most when they choose ' + esc(s.noun) + ', then which provider they would choose. Every provider in the category can be chosen.</p><div class="chips">' + s.crits.map(x => '<span class="chip">' + esc(x) + '</span>').join('') + '</div></div>';
+    $('board').innerHTML = h; return;
+  }
+  const upd = new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+  const modeNote = st === 'closed' ? (lateView ? 'Open voting since the campaign closed on ' + dateOf(s.to) + ' (shown separately)' : 'Campaign result, frozen. The 7-day campaign closed on ' + dateOf(s.to)) : mode === 'delayed' ? 'Delayed: as at the end of ' + dateOf(day - 1) + (day === s.from ? ' (nothing yet)' : '') : 'Live · updated ' + upd;
+  h += '<p class="note" style="margin:0 0 6px"><b>' + c.n.toLocaleString('en-ZA') + '</b> valid demo votes · ' + modeNote + '</p>';
+  if (st === 'closed'){
+    const b0 = build(s);
+    h += '<div class="seg" style="margin:0 0 8px"><button data-late="0" class="' + (lateView ? '' : 'on') + '">Campaign result</button><button data-late="1" class="' + (lateView ? 'on' : '') + '">Open voting (' + b0.late.n.toLocaleString('en-ZA') + ')</button></div>';
+    h += '<p class="note" style="margin:0 0 4px">Voting stays open after the result, with no closing date. Open votes are recorded separately and never change the campaign result.</p>' + movedPanel(s);
+  }
+  if (st === 'live' && mode === 'close'){
+    h += '<div class="locked"><h4>Results are revealed when the window closes</h4><p class="muted">Voting closes at the end of ' + dateOf(s.to) + '. ' + (s.to - day + 1) + ' ' + (s.to - day + 1 === 1 ? 'day' : 'days') + ' to go. Providers in the running, in alphabetical order:</p><div class="chips">' + PROVIDERS.map(p => '<span class="chip">' + esc(p) + '</span>').join('') + '</div></div>';
+    $('board').innerHTML = h; return;
+  }
+  h += '<div class="board-h"><div class="seg"><button data-view="list" class="' + (view === 'list' ? 'on' : '') + '">Ranking</button><button data-view="matrix" class="' + (view === 'matrix' ? 'on' : '') + '">Why matrix</button></div></div>';
+  h += '<div class="q-label">Rank providers by voters who say this matters most:</div><div class="chips"><button class="chip ' + (filter == null ? 'on' : '') + '" data-crit="all">All voters</button>' + s.crits.map((x, k) => '<button class="chip ' + (filter === k ? 'on' : '') + '" data-crit="' + k + '">' + esc(x) + '</button>').join('') + '</div>';
+  // ranking
+  const rows = PROVIDERS.map((nm, p) => {
+    const votes = filter == null ? c.prov[p] : c.pc[p][filter];
+    const base = filter == null ? c.n : c.crit[filter];
+    return { p, nm, votes, share:base ? votes / base * 100 : 0 };
+  }).sort((a, b) => b.share - a.share);
+  const maxShare = Math.max(1, rows[0].share);
+  if (track){ const m = {}; rows.forEach((r, i) => { const old = prevRank[s.id + filter]; m[r.p] = old && old[r.p] != null ? old[r.p] - i : 0; }); arrows[s.id + filter] = m; const np = {}; rows.forEach((r, i) => np[r.p] = i); prevRank[s.id + filter] = np; }
+  const ar = arrows[s.id + filter] || {};
+  if (view === 'list'){
+    h += rows.map((r, i) => {
+      const d = drivers(s, c, r.p); let why;
+      if (filter != null) why = '<b>' + r.votes.toLocaleString('en-ZA') + '</b> of the ' + c.crit[filter].toLocaleString('en-ZA') + ' voters who put <b>' + esc(s.crits[filter].toLowerCase()) + '</b> first';
+      else if (!d) why = 'Needs ' + Math.max(0, MINP - c.prov[r.p]) + ' more votes before we show why';
+      else if (!d.ok.length) why = 'No clear driver yet';
+      else { const t = d.ok[0]; why = 'Chosen mainly for <b>' + esc(t.name.toLowerCase()) + '</b> (' + t.share + '% of its voters, ' + (t.ix / 100).toFixed(1) + '× the average)'; }
+      const a = ar[r.p] > 0 ? '<i class="up">▲</i>' : ar[r.p] < 0 ? '<i class="dn">▼</i>' : '<i>&nbsp;</i>';
+      const me = meMark && meMark.sub === s.id && meMark.p === r.p && meMark.until > Date.now();
+      return '<div class="row ' + (expanded.has(r.p) ? 'open' : '') + (me ? ' me' : '') + '"><button class="row-h" data-row="' + r.p + '" aria-expanded="' + expanded.has(r.p) + '"><div class="rk">' + (i + 1) + a + '</div><div class="av">' + esc(r.nm.replace(/[\[\]]/g, '').split(' ').map(w => w[0]).join('').slice(0, 2)) + '</div><div><div class="nm">' + esc(r.nm) + (me ? '<span class="pill good">Your vote</span>' : '') + '</div><div class="bar"><i style="width:' + (r.share / maxShare * 100).toFixed(1) + '%"></i></div><div class="why">' + why + '</div></div><div class="pc">' + r.share.toFixed(1) + '%<small>' + r.votes.toLocaleString('en-ZA') + ' votes</small></div></button>' + (expanded.has(r.p) ? detail(s, c, r.p) : '') + '</div>';
+    }).join('');
+    if (c.other) h += '<p class="note">Plus ' + c.other + ' votes for providers not listed ("other").</p>';
+  } else {
+    h += '<div style="overflow-x:auto"><table class="matrix"><thead><tr><th>Provider</th><th>Share</th>' + s.crits.map(x => '<th>' + esc(x) + '</th>').join('') + '</tr></thead><tbody>' + rows.map(r => {
+      const tds = s.crits.map((_, k) => { const cell = c.pc[r.p][k], ix = idx(c, r.p, k);
+        if (c.prov[r.p] < MINP || cell < MINC || ix == null) return '<td class="cell" style="background:#f3f4f8;color:#9aa0ae">–</td>';
+        const col = ix >= 100 ? 'rgba(' + RGB() + ',' + Math.min(.8, (ix - 100) / 100 + .06).toFixed(2) + ')' : 'rgba(80,87,102,' + Math.min(.3, (100 - ix) / 200 + .03).toFixed(2) + ')';
+        return '<td class="cell" style="background:' + col + ';color:' + (ix >= 150 ? '#fff' : '#0A0F2E') + '">' + (ix / 100).toFixed(1) + '×</td>'; }).join('');
+      return '<tr><td><b>' + esc(r.nm) + '</b></td><td>' + (c.n ? (c.prov[r.p] / c.n * 100).toFixed(1) : 0) + '%</td>' + tds + '</tr>'; }).join('') + '</tbody></table></div>';
+    h += '<p class="legend">Each cell: how much more (or less) often voters who put that first choose the provider, compared with all voters. 1.0× is average; darker blue is stronger, grey is weaker. "–" means too few votes to show (needs ' + MINP + ' for the provider and ' + MINC + ' in the cell).</p>';
+  }
+  if (view === 'list') h += '<p class="legend">Click a provider to see why. This describes what voters say matters to them, not the provider\'s actual product or price.</p>';
+  $('board').innerHTML = h;
+}
+function detail(s, c, p){
+  const d = drivers(s, c, p);
+  let h = '<div class="detail"><div class="sent">' + sentence(s, c, p) + '</div>';
+  if (d){
+    h += d.arr.map(a => '<div class="mini"><span>' + esc(a.name) + '</span><div class="t"><i style="width:' + Math.min(100, a.share) + '%"></i><u style="left:' + Math.min(100, a.all) + '%"></u></div><span class="ix">' + (a.ix ? (a.ix / 100).toFixed(1) + '×' : '–') + '<br><span class="note" style="font-weight:400">' + a.cell + ' votes</span></span></div>').join('');
+    h += '<p class="legend"><i></i>share of this provider\'s voters who put it first <u></u>share of all voters</p>';
+  }
+  return h + '</div>';
+}
+
+/* ---------- render: side ---------- */
+function renderSide(){
+  const s = subById(selSub), st = statusOf(s), c = visible(s), left = s.to - day + 1;
+  let cta = '<div class="eyebrow" style="color:var(--gold)">Your turn</div><h4>What would you choose?</h4>';
+  if (st === 'live') cta += '<p>' + esc(s.name) + ' window is open for ' + left + (left === 1 ? ' more day' : ' more days') + '. It takes about a minute.</p><button class="btn gold" id="voteBtn">Vote now</button>';
+  else if (st === 'closed') cta += '<p>The campaign ' + esc(s.noun) + ' result is in. Voting stays open all year, with no closing date. Open votes are shown separately and never change it.</p><button class="btn gold" id="voteBtn">Vote any time</button>';
+  else cta += '<p>Voting for ' + esc(s.noun) + ' opens on ' + dateOf(s.from) + '.</p><button class="btn" disabled>Opens ' + dateOf(s.from) + '</button>';
+  $('cta').innerHTML = cta;
+  if (st === 'soon' || !c.n){ $('priority').innerHTML = '<h4>What matters most</h4><p class="note">Appears once voting opens.</p>'; $('mix').innerHTML = ''; return; }
+  const bars = (labels, arr, total, hl) => labels.map((l, i) => '<div class="b"><span>' + esc(l) + '</span><b>' + pct(arr[i], total) + '%</b></div><div class="bar"><i style="width:' + pct(arr[i], total) + '%;' + (hl === i ? 'background:var(--gold)' : '') + '"></i></div>').join('');
+  $('priority').innerHTML = '<h4>What matters most to Mzansi</h4><p class="note" style="margin-top:-4px">' + esc(s.name) + ' · the options voters were asked to choose from</p><div class="bars">' + bars(s.crits, c.crit, c.n, filter) + '</div>';
+  $('mix').innerHTML = '<h4>Voter habits</h4><div class="bars">' + s.qs.map((q, i) => '<div class="eyebrow" style="margin-top:' + (i ? 14 : 6) + 'px">' + esc(q.short) + '</div>' + bars(q.opts, c.x[i], c.n)).join('') + '</div>';
+}
+
+/* ---------- render: commercial / dev / data ---------- */
+function renderCom(){
+  const act = { before:[1,2,5], during:[1,2,3,4,5], after:[1,5,6] }[phase];
+  document.querySelectorAll('#wf .pl-n').forEach(el => el.classList.toggle('act', act.includes(+el.dataset.n)));
+  $('plTbl').innerHTML = PLACEMENTS.map(p => '<tr style="' + (act.includes(p.n) ? 'background:#FFF3EA' : 'opacity:.55') + '"><td><b>' + p.n + '</b></td><td><b>' + esc(p.name) + '</b><br><span class="muted">' + esc(p.size) + '</span><br><span class="note">' + esc(p.rule) + '</span></td><td>' + p.ph.map(x => '<span class="tag">' + x + '</span>').join('') + '</td></tr>').join('');
+  $('cmChips').innerHTML = SUBS.map(s => '<button class="chip ' + (cmSub === s.id ? 'on' : '') + '" data-cm="' + s.id + '">' + s.name + '</button>').join('');
+  const m = CLIENTS[cmSub];
+  $('cmBody').innerHTML = '<p><b>Who</b><br>' + m.who.map(x => '<span class="tag">' + esc(x) + '</span>').join('') + '</p><p><b>What they want</b><br>' + esc(m.wants) + '</p><p><b>Route</b><br>' + esc(m.route) + '</p><p><b>Opening question</b><br><i>"' + esc(m.open) + '"</i></p>';
+}
+function renderDev(){
+  const cfg = { pillar:'Insurance', startsOn:isoOf(1), endsOn:isoOf(35), windowDays:7, windows:SUBS.map(s => ({ id:'insurance-' + s.id, subPillar:s.name, opensOn:isoOf(s.from), closesOn:isoOf(s.to), questions:['priority (' + s.crits.length + ' options)'].concat(s.qs.map(q => q.id + ' (' + q.opts.length + ' options)'), ['provider (' + PROVIDERS.length + ')']), sponsor:null })), resultsMode:mode };
+  SUBS.forEach(s => { if (s.qs.length + 2 > MAXQ) console.warn('Too many questions for ' + s.id); });
+  $('cfgJson').textContent = JSON.stringify(cfg, null, 2);
+}
+function renderData(){
+  $('lvlNote').textContent = LEVELS[level];
+  const R = { low:'good', med:'med', high:'high' };
+  $('dTbl').innerHTML = DATA.filter(d => d.l <= level).map(d => '<tr><td><b>' + esc(d.n) + '</b></td><td>' + esc(d.w) + '</td><td>' + esc(d.v) + '</td><td><span class="pill ' + R[d.r] + '">' + (d.r === 'med' ? 'medium' : d.r) + '</span></td><td><span class="pill ph">' + esc(d.t) + '</span></td></tr>').join('');
+  let s = subById(selSub); if (statusOf(s) === 'soon') s = SUBS.find(x => statusOf(x) !== 'soon') || SUBS[0];
+  const b = build(s).cur; const top = b.crit.indexOf(Math.max.apply(null, b.crit));
+  $('prevTag').textContent = 'Demo numbers · ' + s.name + ' window';
+  const topOf = arr => arr.indexOf(Math.max.apply(null, arr));
+  $('insights').innerHTML = [['What matters most', s.crits[top], pct(b.crit[top], b.n) + '% of voters put it first']].concat(s.qs.map((q, i) => { const t = topOf(b.x[i]); return [q.short, q.opts[t], pct(b.x[i][t], b.n) + '% of voters chose this']; })).map(x => '<div class="card"><div class="eyebrow">' + x[0] + '</div><h3 style="margin:6px 0">' + esc(x[1]) + '</h3><div class="muted">' + esc(x[2]) + '</div></div>').join('');
+}
+
+
+function yearEnd(){
+  const closed = SUBS.filter(s => statusOf(s) === 'closed');
+  if (!closed.length) return '';
+  const rows = closed.map(s => { const b = build(s), ro = ranks(b.cur), rl = ranks(b.late), ok = b.late.n >= MINP; return '<tr><td><b>' + esc(s.name) + '</b></td><td>' + esc(PROVIDERS[ro[0]]) + '</td><td>' + (ok ? esc(PROVIDERS[rl[0]]) : '<span class="muted">too few open votes yet</span>') + '</td><td>' + (!ok ? '' : ro[0] === rl[0] ? '<span class="pill good">Same</span>' : '<span class="pill soon">Changed</span>') + '</td></tr>'; }).join('');
+  return '<div class="card" style="margin-top:16px"><div class="board-h"><div><div class="eyebrow">12-month cycle · preview</div><h3>Who is staying top of mind?</h3></div></div><p class="note">Each window crowns a campaign winner after its 7 days, and that result is never changed. Voting then stays open for the rest of the 12-month cycle. At the end of the cycle a new winner is announced from open voting alone, which rewards staying power rather than a strong launch week. (Open decision: open votes only, or all votes.)</p><table><thead><tr><th>Window</th><th>Campaign winner (7 days)</th><th>Leading in open voting</th><th>Trend</th></tr></thead><tbody>' + rows + '</tbody></table></div>';
+}
+function renderLanes(){
+  const s = subById(selSub), st = statusOf(s), C = CONTENT[s.id];
+  const tile = (txt, lane, n, kind) => '<a class="tile ' + (kind === 'spons' ? 'spons' : '') + '" href="#" onclick="return false"><span class="k">' + (kind === 'spons' ? 'SPONSORED' : kind === 'after' ? 'RESULTS' : 'GUIDE') + '</span><h4>' + esc(txt) + '</h4><span class="go">Read on IOL →</span><span class="tg">' + esc(tag(s, lane, n)) + '</span></a>';
+  let h = '<div class="lane"><div class="lane-h"><h3>Before you choose</h3><span class="note">Neutral explainers · ' + esc(s.name) + '</span></div><div class="tiles">' + C.before.map((x, i) => tile(x, 'before', i + 1, 'before')).join('') + '</div></div>';
+  h += '<div class="lane"><div class="lane-h"><h3>What Mzansi said</h3><span class="note">Editorial on the results</span></div>' + (st === 'closed' ? '<div class="tiles">' + C.after.map((x, i) => tile(x, 'results', i + 1, 'after')).join('') + '</div>' : '<div class="lane-lock">Opens when the ' + esc(s.name) + ' window closes on ' + dateOf(s.to) + '.</div>') + '</div>';
+  h += '<div class="lane"><div class="lane-h"><h3>Sponsored</h3><span class="note">ADVERT · advertising never influences the vote</span></div><div class="tiles">' + tile(C.spons, 'sponsored', 1, 'spons') + '</div></div>';
+  $('lanes').innerHTML = h + yearEnd();
+}
+function renderContent(){
+  const rows = [];
+  SUBS.forEach(s => { const C = CONTENT[s.id];
+    C.before.forEach((x, i) => rows.push([s.name, 'Before you choose', 'From the start of the pillar run', x, tag(s, 'before', i + 1)]));
+    C.after.forEach((x, i) => rows.push([s.name, 'What Mzansi said', 'After ' + dateOf(s.to) + ' (window closes)', x, tag(s, 'results', i + 1)]));
+    rows.push([s.name, 'Sponsored', span(s), C.spons, tag(s, 'sponsored', 1)]); });
+  $('cTbl').innerHTML = rows.map(r => '<tr><td><b>' + esc(r[0]) + '</b></td><td>' + esc(r[1]) + '</td><td>' + esc(r[2]) + '</td><td>' + esc(r[3]) + '</td><td class="note" style="word-break:break-all">' + esc(r[4]) + '</td></tr>').join('');
+}
+function renderAll(track){ renderTop(); renderBoard(track); renderLanes(); renderSide(); renderCom(); renderDev(); renderData(); renderContent(); }
+
+/* ---------- events ---------- */
+function toast(t){ const el = $('toast'); el.textContent = t; el.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('on'), 3200); }
+function selectSub(id){ selSub = id; lateView = false; filter = null; expanded.clear(); renderAll(false); }
+document.querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.tab').forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-selected', x === b); });
+  document.querySelectorAll('.pane').forEach(p => p.classList.toggle('on', p.id === 'pane-' + b.dataset.tab));
+  window.scrollTo(0, 0);
+}));
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-pillar],[data-sub],[data-late],[data-row],[data-crit],[data-view],[data-p],[data-l],[data-cm],#voteBtn,#mClose'); if (!t) return;
+  if (t.dataset.pillar != null){ railSel = +t.dataset.pillar; renderTop(); }
+  else if (t.dataset.sub) selectSub(t.dataset.sub);
+  else if (t.dataset.late != null){ lateView = t.dataset.late === '1'; renderBoard(false); renderSide(); }
+  else if (t.dataset.row != null){ const p = +t.dataset.row; expanded.has(p) ? expanded.delete(p) : expanded.add(p); renderBoard(false); }
+  else if (t.dataset.crit != null){ filter = t.dataset.crit === 'all' ? null : +t.dataset.crit; renderBoard(true); renderSide(); }
+  else if (t.dataset.view){ view = t.dataset.view; renderBoard(false); }
+  else if (t.dataset.p){ phase = t.dataset.p; document.querySelectorAll('#phase button').forEach(b => b.classList.toggle('on', b === t)); renderCom(); }
+  else if (t.dataset.l){ level = +t.dataset.l; document.querySelectorAll('#lvl button').forEach(b => b.classList.toggle('on', b === t)); renderData(); }
+  else if (t.dataset.cm){ cmSub = t.dataset.cm; renderCom(); }
+  else if (t.id === 'voteBtn') openModal();
+  else if (t.id === 'mClose') closeModal();
+});
+$('day').addEventListener('input', e => { day = +e.target.value; lateView = false; const l = liveSub(); if (l) selSub = l.id; filter = null; expanded.clear(); renderAll(false); });
+document.querySelectorAll('#theme button').forEach(b => b.addEventListener('click', () => { document.documentElement.dataset.theme = b.dataset.theme; document.querySelectorAll('#theme button').forEach(x => x.classList.toggle('on', x === b)); renderBoard(false); }));
+$('mode').addEventListener('change', e => { mode = e.target.value; renderAll(false); });
+$('modal').addEventListener('click', e => { if (e.target === $('modal')) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+/* ---------- widget modal ---------- */
+let frame = null;
+function widgetFor(s){
+  const cfg = { campaign:'insurance-' + s.id, category:s.noun.charAt(0).toUpperCase() + s.noun.slice(1), closes:dateOf(s.to), hubUrl:'#', rulesUrl:'#', relatedText:'Read: how to compare ' + s.noun, relatedUrl:'#', endpoint:'',
+    sponsor:{ label:'Presented by', name:'[Advertiser name]', url:'' },
+    questions:[
+      { id:'priority', short:'What matters most', type:'single', text:'What matters most when you choose ' + s.noun + '?', options:s.crits },
+      ].concat(s.qs.map(q => ({ id:q.id, short:q.short, type:'single', text:q.text, options:q.opts }))).concat([
+      { id:'provider', short:'The provider you would choose', type:'provider', text:'Which provider would you choose for ' + s.noun + '?', providers:PROVIDERS }
+    ]) };
+  let html = WIDGET_HTML;
+  if (statusOf(s) === 'closed') html = html.split("'Voting closes ' + CONFIG.closes").join("'Voting stays open all year'").split("after voting closes ' + CONFIG.closes + '.'").join("as the open votes come in.'");
+  return html.replace(/const CONFIG = \{[\s\S]*?\n\};\n/, () => 'const CONFIG = ' + JSON.stringify(cfg, null, 2) + ';\n');
+}
+function openModal(){
+  const s = subById(selSub); if (statusOf(s) === 'soon') return;
+  $('mHead').textContent = (statusOf(s) === 'closed' ? 'Open vote: ' : 'Demo vote: ') + s.noun;
+  const host = $('frameHost'); host.innerHTML = '';
+  frame = document.createElement('iframe'); frame.title = "Mzansi's Choice voting widget"; frame.srcdoc = widgetFor(s); host.appendChild(frame);
+  $('modal').classList.add('on'); $('mClose').focus();
+}
+function closeModal(){ $('modal').classList.remove('on'); $('frameHost').innerHTML = ''; frame = null; }
+window.addEventListener('message', e => {
+  const d = e.data; if (!frame || e.source !== frame.contentWindow || !d || d.source !== 'mzansis-choice' || d.type !== 'vote') return;
+  const pl = d.payload || {}, a = pl.answers || {}, s = subById(selSub); if (!s) return;
+  lastVote = pl; $('lastVote').textContent = JSON.stringify(pl, null, 2);
+  const k = s.crits.indexOf(a.priority), p = PROVIDERS.indexOf(a.provider);
+  const v = { c:k < 0 ? 0 : k, p:p, x:s.qs.map(q => Math.max(0, q.opts.indexOf(a[q.id]))) };
+  const isLate = statusOf(s) === 'closed';
+  (isLate ? lateX : extras)[s.id].push(v); if (isLate) lateView = true; meMark = { sub:s.id, p:p, until:Date.now() + 8000 };
+  setTimeout(() => closeModal(), 1800);
+  setTimeout(() => { renderAll(true); toast(isLate ? 'Open vote recorded. The campaign result is unchanged.' : mode === 'live' ? 'Your demo vote is on the board' : 'Your demo vote is counted. In this results mode it shows later.'); }, 1800);
+});
+
+/* ---------- demo traffic ---------- */
+setInterval(() => {
+  if (!$('traffic').checked || document.hidden) return;
+  const sc = subById(selSub);
+  if (sc && statusOf(sc) === 'closed' && document.getElementById('pane-hub').classList.contains('on') && !$('modal').classList.contains('on')){ lateX[sc.id].push(sampleVote(sc, Math.random, true)); renderBoard(true); renderSide(); return; }
+  const s = liveSub(); if (!s) return;
+  const r = Math.random, n = 1 + Math.floor(r() * 3);
+  for (let i = 0; i < n; i++) extras[s.id].push(sampleVote(s, r));
+  if (selSub === s.id && document.getElementById('pane-hub').classList.contains('on') && !$('modal').classList.contains('on')){ renderBoard(true); renderSide(); renderData(); }
+}, 3000);
+
+selSub = (liveSub() || SUBS[0]).id;
+renderAll(true);
+window.__hub = { SUBS, setDay(d){ $('day').value = d; $('day').dispatchEvent(new Event('input')); } };
+})();
+
+</script>
+</body>
+</html>
